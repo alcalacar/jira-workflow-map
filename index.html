@@ -414,6 +414,49 @@
         flex-direction: column;
         gap: 0.15rem;
         font-size: 0.8rem;
+        padding: 0.6rem 0.8rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid transparent;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+      }
+
+      @keyframes glossarySpotlightPulse {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.8);
+        }
+        30% {
+          transform: scale(1.035);
+          box-shadow: 0 0 25px rgba(56, 189, 248, 0.65), 0 0 0 2px #38bdf8;
+        }
+        70% {
+          transform: scale(1.02);
+          box-shadow: 0 0 20px rgba(56, 189, 248, 0.5), 0 0 0 2px #38bdf8;
+        }
+        100% {
+          transform: scale(1.03);
+          box-shadow: 0 0 22px rgba(56, 189, 248, 0.6), 0 0 0 2px #38bdf8;
+        }
+      }
+
+      .glossary-item.glossary-highlight-pulse {
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.15)) !important;
+        border: 1.5px solid #38bdf8 !important;
+        border-left: 4.5px solid var(--wf-story) !important;
+        animation: glossarySpotlightPulse 1.2s ease-in-out infinite alternate;
+        z-index: 10;
+      }
+
+      .glossary-item.glossary-highlight-pulse dt {
+        color: #38bdf8 !important;
+        font-size: 0.92rem !important;
+        text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+      }
+
+      .glossary-item.glossary-highlight-pulse dd {
+        color: var(--text-main) !important;
+        font-weight: 500;
       }
 
       .glossary-item dt {
@@ -2277,8 +2320,11 @@
 
         function glossify(html) {
           return html.replace(GLOSSARY_RE, function (match, base) {
+            var cleanKey = base.replace(/[^a-zA-Z0-9]/g, '_');
             return (
-              '<abbr class="gloss" title="' +
+              '<abbr class="gloss" data-term="' +
+              cleanKey +
+              '" title="' +
               GLOSSARY[base].replace(/"/g, '&quot;') +
               '">' +
               match +
@@ -2575,7 +2621,7 @@
               : '';
 
             var eyebrowVia = node.via
-              ? '<span class="v-via-eyebrow">via: ' + esc(node.via) + ' →</span>'
+              ? '<span class="v-via-eyebrow">via: ' + glossify(esc(node.via)) + ' →</span>'
               : '';
 
             var chevronHtml = hasDetail
@@ -2710,7 +2756,7 @@
                     esc(fromName) +
                     excTag +
                     '</b> <span>→</span> <span class="origin-via">' +
-                    esc(s.label) +
+                    glossify(esc(s.label)) +
                     '</span></li>'
                   );
                 })
@@ -2734,7 +2780,7 @@
                       : '';
                   return (
                     '<li><span class="origin-via">' +
-                    esc(s.label) +
+                    glossify(esc(s.label)) +
                     '</span> <span>→</span> ' +
                     '<b>' +
                     toChip +
@@ -2797,7 +2843,7 @@
                       esc(formatStatusName(fromName)) +
                       '</span> <span class="origin-arrow">→</span> ' +
                       '<span class="origin-via">' +
-                      esc(s.label) +
+                      glossify(esc(s.label)) +
                       '</span></li>'
                     );
                   })
@@ -3074,7 +3120,7 @@
             ? '<p class="journey-note" style="margin-top:0.3rem;">' + glossify(esc(note)) + '</p>'
             : '';
 
-          var eyebrowVia = via ? '<span class="v-via-eyebrow">via: ' + esc(via) + ' →</span>' : '';
+          var eyebrowVia = via ? '<span class="v-via-eyebrow">via: ' + glossify(esc(via)) + ' →</span>' : '';
 
           var iconHtml = typeIcon(wf.issueTypes[0], wf.color);
           var formattedName = formatStatusName(st.name);
@@ -3428,8 +3474,11 @@
           document.getElementById('glossary-list').innerHTML = Object.keys(GLOSSARY)
             .sort()
             .map(function (term) {
+              var cleanKey = term.replace(/[^a-zA-Z0-9]/g, '_');
               return (
-                '<div class="glossary-item"><dt>' +
+                '<div class="glossary-item" id="glossary-term-' +
+                cleanKey +
+                '"><dt>' +
                 esc(term) +
                 '</dt><dd>' +
                 esc(GLOSSARY[term]) +
@@ -3437,6 +3486,31 @@
               );
             })
             .join('');
+        }
+
+        function highlightGlossaryTerm(termKey) {
+          var details = document.getElementById('glossary-section');
+          if (details) {
+            details.open = true;
+          }
+
+          var cleanKey = String(termKey).replace(/[^a-zA-Z0-9]/g, '_');
+          var itemEl = document.getElementById('glossary-term-' + cleanKey);
+          if (itemEl) {
+            itemEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            document.querySelectorAll('.glossary-item').forEach(function (el) {
+              el.classList.remove('glossary-highlight-pulse');
+            });
+
+            setTimeout(function () {
+              itemEl.classList.add('glossary-highlight-pulse');
+            }, 100);
+
+            setTimeout(function () {
+              itemEl.classList.remove('glossary-highlight-pulse');
+            }, 4000);
+          }
         }
 
         // Theme Toggle Handler (Sun / Moon Icon Button)
@@ -3662,6 +3736,20 @@
             if (details) {
               details.open = true;
               details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        });
+        // Global click listener for glossary acronym links (.gloss & .acronym-link)
+        document.addEventListener('click', function (e) {
+          var glossEl = e.target.closest('.gloss, .acronym-link');
+          if (glossEl) {
+            var term = glossEl.getAttribute('data-term') || glossEl.textContent.trim();
+            if (term) {
+              var baseTerm = term.replace(/s$/, '');
+              if (!GLOSSARY[baseTerm] && GLOSSARY[term]) {
+                baseTerm = term;
+              }
+              highlightGlossaryTerm(baseTerm);
             }
           }
         });
