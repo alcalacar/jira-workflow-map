@@ -52,9 +52,17 @@ npx serve .
 
 ---
 
+## 🔄 Maintenance & Sync
+
+The raw Jira Cloud workflow definitions are stored in [`schema/jira-workflows.json`](./schema/jira-workflows.json).
+
+When Jira workflows or QA methodology stages change in the future, follow the AI prompt guide in **[`UPDATE_GUIDE.md`](./UPDATE_GUIDE.md)** to instantly update `index.html` using any AI assistant (Claude, Antigravity, ChatGPT, Cursor).
+
+---
+
 ## 👤 Author
 
 Crafted with ❤️ by **[Carlos Alcalá (alcalacar)](https://github.com/alcalacar)**.
 
 ---
-*Reflects the actual Jira Cloud Workflow Scheme defined in `.agents/jira-workflows.json` & `project.yaml`.*
+*Reflects the actual Jira Cloud Workflow Scheme defined in `schema/jira-workflows.json`.*
