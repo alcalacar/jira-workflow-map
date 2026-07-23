@@ -1,0 +1,3592 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mapa de Workflows — Bunkai QA</title>
+
+    <!-- Modern Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        /* Theme colors (Dark default) */
+        --bg-dark: #090d16;
+        --bg-card: rgba(18, 26, 43, 0.85);
+        --bg-card-hover: rgba(28, 39, 64, 0.95);
+        --bg-sunken: rgba(11, 16, 27, 0.85);
+        --bg-drawer: #0e1524;
+        --border-color: rgba(255, 255, 255, 0.1);
+        --border-strong: rgba(255, 255, 255, 0.2);
+
+        --text-main: #f8fafc;
+        --text-muted: #cbd5e1;
+        --text-faint: #94a3b8;
+
+        --shadow-color: rgba(0, 0, 0, 0.45);
+        --glow-intensity: 0.25;
+
+        /* Family accent colors */
+        --wf-epic: #a855f7; /* Purple */
+        --wf-story: #3b82f6; /* Royal Blue */
+        --wf-bug: #ef4444; /* Crimson Red */
+        --wf-tech: #14b8a6; /* Teal */
+        --wf-tc: #10b981; /* Emerald Green */
+        --wf-plan: #f59e0b; /* Amber */
+        --wf-exec: #8b5cf6; /* Violet */
+        --wf-set: #06b6d4; /* Cyan */
+        --wf-pre: #ec4899; /* Pink */
+
+        --cat-new: #94a3b8; /* Slate / Cool Gray (Jira To Do) */
+        --cat-working: #3b82f6; /* Royal Blue (Jira In Progress) */
+        --cat-done: #22c55e; /* Emerald / Green (Jira Done) */
+        --exception: #f43f5e;
+
+        /* Typography */
+        --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+      }
+
+      /* Light Theme override with High Contrast WCAG AAA Text */
+      .light-theme {
+        --bg-dark: #f1f5f9;
+        --bg-card: rgba(255, 255, 255, 0.95);
+        --bg-card-hover: #ffffff;
+        --bg-sunken: #e2e8f0;
+        --bg-drawer: #ffffff;
+        --border-color: rgba(15, 23, 42, 0.15);
+        --border-strong: rgba(15, 23, 42, 0.3);
+
+        --text-main: #0f172a;
+        --text-muted: #334155; /* Dark slate for readable subtexts */
+        --text-faint: #475569; /* Darker gray for labels & badges */
+
+        --shadow-color: rgba(15, 23, 42, 0.1);
+        --glow-intensity: 0.12;
+
+        --wf-epic: #8925d9;
+        --wf-story: #1d4ed8;
+        --wf-bug: #b91c1c;
+        --wf-tech: #0f766e;
+        --wf-tc: #047857;
+        --wf-plan: #b45309;
+        --wf-exec: #6d28d9;
+        --wf-set: #0e7490;
+        --wf-pre: #be185d;
+
+        --cat-new: #64748b; /* Cool Dark Slate for Light Mode To Do */
+        --cat-working: #1d4ed8; /* Strong Royal Blue for Light Mode In Progress */
+        --cat-done: #15803d; /* Strong Green for Light Mode Done */
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        font-family: var(--font-body);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      .wrap {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 5rem;
+        overflow-x: hidden;
+      }
+
+      /* Glassmorphism utility */
+      .glass {
+        background: var(--bg-card);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+      }
+
+      /* Top Navigation Bar & Header */
+      header.top-header {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        margin-bottom: 2rem;
+      }
+
+      .header-main-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+      }
+
+      .title-area .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--wf-story);
+        margin: 0 0 0.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .title-area .eyebrow-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--wf-story);
+        box-shadow: 0 0 10px var(--wf-story);
+      }
+
+      .title-area h1 {
+        font-family: var(--font-display);
+        font-size: clamp(1.8rem, 4vw, 2.75rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0 0 0.5rem;
+        color: var(--text-main);
+      }
+
+      .title-area p.subhead {
+        color: var(--text-muted);
+        font-size: 0.98rem;
+        max-width: 46rem;
+        margin: 0;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        position: relative;
+      }
+
+      /* Indexing Search Bar */
+      .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-input {
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 0.6rem 1rem 0.6rem 2.4rem;
+        color: var(--text-main);
+        font-family: var(--font-body);
+        font-size: 0.88rem;
+        outline: none;
+        width: 240px;
+        transition: all 0.2s ease;
+      }
+
+      .search-input:focus {
+        border-color: var(--wf-story);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        width: 300px;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 0.85rem;
+        color: var(--text-faint);
+        pointer-events: none;
+      }
+
+      /* Indexing Search Results Dropdown */
+      .search-results-dropdown {
+        position: absolute;
+        top: 115%;
+        left: 0;
+        right: 0;
+        min-width: 340px;
+        max-height: 420px;
+        overflow-y: auto;
+        background: var(--bg-drawer);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+        box-shadow: 0 12px 30px var(--shadow-color);
+        z-index: 100;
+        padding: 0.6rem;
+        display: none;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .search-results-dropdown.is-open {
+        display: flex;
+        animation: fadeSlideIn 0.2s ease;
+      }
+
+      .search-result-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .search-result-group-title {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        padding: 0.3rem 0.5rem 0.1rem;
+      }
+
+      .search-result-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.45rem 0.65rem;
+        border-radius: var(--radius-sm);
+        background: var(--bg-sunken);
+        cursor: pointer;
+        font-size: 0.84rem;
+        transition: background 0.15s ease;
+      }
+
+      .search-result-item:hover {
+        background: var(--bg-card-hover);
+      }
+
+      .search-result-item .match-name {
+        font-weight: 600;
+        color: var(--text-main);
+      }
+
+      .search-result-item .match-context {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-faint);
+      }
+
+      /* Icon-only Sun / Moon Theme Toggle */
+      .theme-toggle-icon {
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-main);
+        cursor: pointer;
+        transition: all 0.25 cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+      }
+
+      .theme-toggle-icon:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--wf-story);
+        transform: scale(1.08) rotate(15deg);
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+      }
+
+      /* Legend bar */
+      .legend-bar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+        padding: 0.75rem 1.2rem;
+        border-radius: var(--radius-md);
+        font-size: 0.84rem;
+        color: var(--text-muted);
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-weight: 500;
+      }
+
+      .legend-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+
+      .legend-dot.new {
+        background: var(--cat-new);
+        box-shadow: 0 0 8px var(--cat-new);
+      }
+      .legend-dot.working {
+        background: var(--cat-working);
+        box-shadow: 0 0 8px var(--cat-working);
+      }
+      .legend-dot.done {
+        background: var(--cat-done);
+        box-shadow: 0 0 8px var(--cat-done);
+      }
+
+      .exc-symbol {
+        font-size: 0.9rem;
+        margin-right: 0.35rem;
+        color: var(--exception);
+        display: inline-block;
+      }
+
+      /* Instant Glossary & Tooltip Display */
+      .glossary-details[open] .glossary-grid {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .acronym {
+        border-bottom: 1px dashed var(--wf-story);
+        cursor: help;
+        position: relative;
+      }
+
+      /* Glossary accordion summary */
+      .glossary-details {
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        margin-top: 0.5rem;
+        overflow: hidden;
+      }
+
+      .glossary-summary {
+        padding: 0.65rem 1rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        user-select: none;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .glossary-summary:hover {
+        color: var(--text-main);
+      }
+
+      .glossary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+        gap: 0.6rem;
+        padding: 1rem;
+        border-top: 1px solid var(--border-color);
+        background: var(--bg-card);
+      }
+
+      .glossary-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        font-size: 0.8rem;
+      }
+
+      .glossary-item dt {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--wf-story);
+      }
+
+      .glossary-item dd {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+      }
+
+      /* Nav Tabs System */
+      .nav-tabs-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        margin-bottom: 2.2rem;
+        position: sticky;
+        top: 1rem;
+        z-index: 85;
+      }
+
+      .tab-group {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        overflow-x: auto;
+        padding: 0.4rem;
+        border-radius: var(--radius-md);
+        scrollbar-width: none;
+      }
+
+      .tab-group::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tab-group-label {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-faint);
+        padding: 0 0.6rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .tab-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        padding: 0.45rem 0.85rem;
+        color: var(--text-muted);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .tab-btn:hover {
+        color: var(--text-main);
+        background: var(--bg-card-hover);
+      }
+
+      .tab-btn.active {
+        color: var(--text-main);
+        background: var(--tab-color, var(--bg-card-hover));
+        border-color: var(--tab-border, var(--border-strong));
+        box-shadow: 0 4px 12px var(--shadow-color);
+        font-weight: 600;
+      }
+
+      .tab-btn .dot-icon {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--dot-color, var(--text-faint));
+        flex-shrink: 0;
+      }
+
+      .tab-btn.active .dot-icon {
+        box-shadow: 0 0 8px var(--dot-color);
+      }
+
+      .tab-badge {
+        background: var(--wf-story);
+        color: #fff;
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.05rem 0.4rem;
+        border-radius: 10px;
+      }
+
+      /* Main Container Layout: Canvas & Station Inspector Panel */
+      .workspace-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.8rem;
+        align-items: start;
+      }
+
+      .workspace-grid.has-drawer {
+        grid-template-columns: 1fr 340px;
+      }
+
+      @media (max-width: 1080px) {
+        .workspace-grid.has-drawer {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Panel Head */
+      .panel-head {
+        margin-bottom: 1.5rem;
+      }
+
+      .panel-head .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-faint);
+        margin: 0 0 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
+      .level-badge {
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        padding: 0.1rem 0.45rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+
+      .panel-head h2 {
+        font-family: var(--font-display);
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0 0 0.4rem;
+        color: var(--wf-color, var(--text-main));
+      }
+
+      .panel-sub {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      /* Vertical Railway Circuit Track Visuals (Slim & Focused) */
+      .vertical-circuit {
+        position: relative;
+        padding: 1.2rem 1.4rem;
+        border-radius: var(--radius-lg);
+        margin: 0 auto 1.8rem auto;
+        max-width: 780px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .v-phase-divider {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 1.2rem 0 0.6rem 0;
+        position: relative;
+      }
+
+      .v-phase-divider:first-child {
+        margin-top: 0.1rem;
+      }
+
+      .v-phase-badge {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        padding: 0.18rem 0.6rem;
+        border-radius: var(--radius-sm);
+      }
+
+      .v-phase-line {
+        flex: 1;
+        height: 1px;
+        background: var(--border-color);
+      }
+
+      .vertical-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+      }
+
+      /* Glowing Vertical Metro Line */
+      .vertical-steps::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 18px;
+        bottom: 28px;
+        width: 4px;
+        background: var(--wf-color, var(--wf-story));
+        opacity: 0.5;
+        border-radius: 2px;
+        z-index: 0;
+        box-shadow: 0 0 10px var(--wf-color, var(--wf-story));
+      }
+
+      .v-step-item {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Japandi/Apple Eyebrow Transition Label */
+      .v-card-main-col {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+
+      .v-via-eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: var(--text-faint);
+        letter-spacing: 0.02em;
+      }
+
+      .v-step-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.2rem;
+      }
+
+      .v-node-dot-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 42px;
+        height: 44px;
+        flex-shrink: 0;
+        z-index: 2;
+      }
+
+      .v-node-number {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--text-faint);
+        position: absolute;
+        left: -2px;
+      }
+
+      .v-node-dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--bg-dark);
+        border: 3.5px solid var(--wf-color, var(--text-faint));
+        transition: all 0.25s ease;
+        box-shadow: 0 0 0 3px var(--bg-dark);
+      }
+
+      .v-node-dot.cat-new {
+        border-color: var(--cat-new);
+      }
+      .v-node-dot.cat-working {
+        border-color: var(--cat-working);
+      }
+      .v-node-dot.cat-done {
+        border-color: var(--cat-done);
+      }
+      .v-node-dot.is-exception {
+        border-color: var(--exception);
+      }
+
+      .v-station-card {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        background: var(--bg-card);
+        border: 1.5px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 0.65rem 1.1rem;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .v-station-card.is-static {
+        cursor: default !important;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
+      .v-station-card.is-static:hover {
+        transform: none !important;
+        box-shadow: none !important;
+        border-color: var(--border-color) !important;
+        background: var(--bg-card) !important;
+      }
+
+      .v-station-card:hover {
+        transform: translateX(6px);
+        border-color: var(--wf-color, var(--text-main));
+        box-shadow:
+          0 6px 20px rgba(0, 0, 0, 0.3),
+          0 0 15px rgba(59, 130, 246, calc(var(--glow-intensity) * 1.5));
+        background: var(--bg-card-hover);
+      }
+
+      .v-station-card.is-selected {
+        border-color: var(--wf-color, var(--text-main));
+        background: var(--bg-card-hover);
+        box-shadow:
+          0 0 0 3px rgba(59, 130, 246, 0.25),
+          0 8px 24px var(--shadow-color);
+        transform: translateX(6px);
+      }
+
+      .v-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .v-station-name {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.98rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .v-cat-badge {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.15rem 0.5rem;
+        border-radius: var(--radius-sm);
+        display: inline-flex;
+        align-items: center;
+      }
+      .v-cat-badge.cat-new {
+        color: #cbd5e1;
+        background: rgba(148, 163, 184, 0.14);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+      }
+      .v-cat-badge.cat-working {
+        color: #60a5fa;
+        background: rgba(59, 130, 246, 0.14);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+      .v-cat-badge.cat-done {
+        color: #4ade80;
+        background: rgba(34, 197, 94, 0.14);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .step-chip {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        border-radius: 3px;
+        padding: 0.06rem 0.38rem;
+        margin-right: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        vertical-align: middle;
+      }
+
+      .acronym-link {
+        color: var(--text-main);
+        font-weight: 600;
+        border-bottom: 1.5px dotted var(--wf-story, #3b82f6);
+        text-decoration: none;
+        cursor: help;
+        padding: 0 0.12rem;
+        transition: all 0.2s ease;
+        border-radius: 2px;
+      }
+      .acronym-link:hover {
+        border-bottom-color: #38bdf8;
+        background: rgba(56, 189, 248, 0.14);
+        color: #38bdf8;
+      }
+
+      .v-cat-badge.cat-new {
+        color: var(--cat-new);
+        background: rgba(148, 163, 184, 0.12);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+      }
+      .cmd-k-badge {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--text-faint);
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 0.15rem 0.4rem;
+        margin-left: 0.4rem;
+        pointer-events: none;
+        user-select: none;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .step-num-pill {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--text-faint);
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        border-radius: 3px;
+        padding: 0.05rem 0.35rem;
+        margin-right: 0.25rem;
+        vertical-align: middle;
+      }
+
+      .v-chevron {
+        font-size: 0.75rem;
+        color: var(--text-faint);
+        margin-left: 0.35rem;
+        transition:
+          transform 0.22s ease,
+          color 0.22s ease;
+        display: inline-block;
+      }
+
+      .v-station-card.is-selected .v-chevron {
+        transform: rotate(180deg);
+        color: var(--wf-color, var(--text-main));
+      }
+
+      .v-station-card.is-static {
+        cursor: default;
+      }
+
+      .sidings-filter-bar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.2rem;
+      }
+
+      .siding-filter-btn {
+        font-family: var(--font-body);
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: 0.25rem 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .siding-filter-btn:hover {
+        border-color: var(--border-strong);
+        color: var(--text-main);
+      }
+
+      .siding-filter-btn.active {
+        background: var(--bg-sunken);
+        border-color: var(--wf-color, var(--border-strong));
+        color: var(--text-main);
+      }
+
+      .no-sidings-banner {
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius-md);
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .no-sidings-icon {
+        color: var(--cat-done);
+        font-weight: 800;
+      }
+
+      .v-card-badges {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .v-agent-pill {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        padding: 0.15rem 0.45rem;
+        border-radius: var(--radius-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+
+      .v-agent-dot {
+        font-size: 0.55rem;
+        color: #38bdf8;
+      }
+
+      .v-card-bottom {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-top: 0.3rem;
+        border-top: 1px dashed var(--border-color);
+      }
+
+      .v-method-tag {
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        color: #38bdf8;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .v-method-dot {
+        font-size: 0.6rem;
+        color: #38bdf8;
+      }
+
+      .station:hover {
+        transform: translateY(-4px);
+        border-color: var(--wf-color, var(--text-main));
+        box-shadow:
+          0 8px 20px rgba(0, 0, 0, 0.3),
+          0 0 15px rgba(59, 130, 246, calc(var(--glow-intensity) * 1.5));
+        background: var(--bg-card-hover);
+      }
+
+      .station.is-selected {
+        border-color: var(--wf-color, var(--text-main));
+        background: var(--bg-card-hover);
+        box-shadow:
+          0 0 0 3px rgba(59, 130, 246, 0.25),
+          0 8px 22px var(--shadow-color);
+        transform: translateY(-3px);
+      }
+
+      .station-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--bg-dark);
+        border: 3px solid var(--wf-color, var(--text-faint));
+        transition: all 0.2s ease;
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .station.cat-new .station-dot {
+        border-color: var(--cat-new);
+      }
+      .station.cat-working .station-dot {
+        border-color: var(--cat-working);
+      }
+      .station.cat-done .station-dot {
+        border-color: var(--cat-done);
+      }
+      .station.is-exception .station-dot {
+        border-color: var(--exception);
+      }
+
+      .station.is-selected .station-dot {
+        background: var(--wf-color, var(--text-main));
+        box-shadow: 0 0 12px var(--wf-color, var(--text-main));
+      }
+
+      /* Indicator dot for QA method link */
+      .station.has-method::after {
+        content: '●';
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        font-size: 0.6rem;
+        color: #38bdf8;
+        background: var(--bg-dark);
+        border-radius: 50%;
+        width: 12px;
+        height: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 6px #38bdf8;
+      }
+
+      .station-name {
+        font-weight: 600;
+        font-size: 0.84rem;
+        color: var(--text-main);
+        line-height: 1.25;
+        white-space: normal;
+        text-align: center;
+        word-break: normal;
+      }
+
+      .main-track-head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 auto 0.75rem auto;
+        max-width: 780px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .main-track-badge {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--cat-done);
+        background: rgba(52, 211, 153, 0.12);
+        border: 1px solid rgba(52, 211, 153, 0.3);
+        padding: 0.2rem 0.65rem;
+        border-radius: var(--radius-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .main-track-badge::before {
+        content: '✓';
+        font-weight: 800;
+      }
+
+      /* Type Chips & Icons */
+      .chip-type {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: 0.2rem 0.55rem;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--text-main);
+      }
+
+      .type-icon {
+        flex-shrink: 0;
+        border-radius: 3px;
+      }
+
+      /* Sidings Section (Sectioned into Standard vs Exceptions) */
+      .sidings-head {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 2rem 0 0.3rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .sidings-subhead {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-faint);
+        margin: 1.2rem 0 0.6rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .sidings-subhead.is-exception {
+        color: var(--exception);
+      }
+
+      .siding-groups {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+        gap: 0.85rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .origin-arrow {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--text-faint);
+        opacity: 0.7;
+        margin: 0 0.15rem;
+      }
+
+      .siding-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-left: 4px solid var(--wf-color, var(--wf-story));
+        border-radius: var(--radius-md);
+        padding: 0.85rem 1rem;
+        cursor: default;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .siding-group.is-highlighted {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px var(--shadow-color);
+        border-color: var(--border-strong);
+        background: var(--bg-card-hover);
+      }
+
+      .siding-group.is-exception {
+        border: 1px dashed var(--exception);
+        border-left: 4px solid var(--exception);
+      }
+
+      .siding-origins {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .siding-origins li {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        font-size: 0.82rem;
+      }
+
+      .origin-from {
+        font-weight: 600;
+        color: var(--text-main);
+      }
+      .origin-via {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        background: var(--bg-sunken);
+        padding: 0.1rem 0.4rem;
+        border-radius: 4px;
+      }
+
+      .siding-group-arrival {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-top: 1px dashed var(--border-color);
+        padding-top: 0.55rem;
+        margin-top: auto;
+      }
+
+      .arrival-arrow {
+        font-size: 0.9rem;
+      }
+
+      .arrival-arrow.cat-new {
+        color: var(--cat-new);
+      }
+      .arrival-arrow.cat-working {
+        color: var(--cat-working);
+      }
+      .arrival-arrow.cat-done {
+        color: var(--cat-done);
+      }
+
+      .siding-group-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--wf-color, var(--text-muted));
+      }
+      .siding-group.is-exception .siding-group-dot {
+        background: var(--exception);
+      }
+      .siding-group-to {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--wf-color, var(--text-main));
+      }
+      .siding-group.is-exception .siding-group-to {
+        color: var(--exception);
+      }
+      .siding-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 0.15rem;
+      }
+
+      .siding-group-count {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--text-faint);
+        background: var(--bg-sunken);
+        padding: 0.1rem 0.45rem;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+      }
+
+      .siding-group-to {
+        font-weight: 700;
+        font-size: 0.88rem;
+      }
+
+      .siding-group-to.cat-new {
+        color: var(--cat-new) !important;
+      }
+      .siding-group-to.cat-working {
+        color: var(--cat-working) !important;
+      }
+      .siding-group-to.cat-done {
+        color: var(--cat-done) !important;
+      }
+
+      .siding-group-dot.cat-new {
+        background: var(--cat-new) !important;
+      }
+      .siding-group-dot.cat-working {
+        background: var(--cat-working) !important;
+      }
+      .siding-group-dot.cat-done {
+        background: var(--cat-done) !important;
+      }
+
+      .v-card-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      /* Inline Inspector Panel directly inside station card column domain */
+      .v-inline-inspector {
+        display: none;
+        margin-top: 0.65rem;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 1.2rem 1.35rem;
+        background: var(--bg-sunken);
+        border: 1.5px solid var(--wf-color, var(--border-strong));
+        border-radius: var(--radius-md);
+        box-shadow: 0 8px 24px var(--shadow-color);
+        animation: fadeSlideIn 0.25s ease;
+      }
+
+      .v-inline-inspector.is-open {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .station-detail-placeholder {
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        text-align: center;
+        padding: 2.5rem 1rem;
+        line-height: 1.6;
+      }
+
+      .station-detail-head {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.8rem;
+      }
+
+      .station-detail-title {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      .station-detail-cat {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        margin: 0;
+      }
+
+      .station-detail-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .station-detail-section h4 {
+        font-size: 0.82rem;
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-faint);
+        margin: 0;
+      }
+
+      .station-detail-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .station-detail-list li {
+        font-size: 0.82rem;
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        padding: 0.4rem 0.6rem;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .station-detail-empty {
+        font-size: 0.82rem;
+        color: var(--text-faint);
+        font-style: italic;
+        margin: 0;
+      }
+
+      /* QA Method Badge Section */
+      .station-detail-method {
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: var(--radius-md);
+        padding: 0.85rem;
+      }
+
+      .method-badge-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 0.4rem;
+      }
+
+      .method-badge {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: #0284c7;
+        color: #ffffff;
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+      }
+
+      .method-stage {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: #38bdf8;
+        font-weight: 600;
+      }
+
+      .method-text {
+        font-size: 0.82rem;
+        color: var(--text-main);
+        margin: 0;
+        line-height: 1.45;
+      }
+
+      /* Levels View Styling */
+      .levels-intro {
+        max-width: 48rem;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      .container-band {
+        border: 2px dashed var(--wf-epic);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1.8rem;
+        position: relative;
+      }
+
+      .band-tag {
+        position: absolute;
+        top: -0.75rem;
+        left: 1.2rem;
+        background: var(--bg-dark);
+        padding: 0 0.6rem;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--wf-epic);
+        font-weight: 700;
+      }
+
+      .l2-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+        gap: 1.2rem;
+        margin-top: 0.6rem;
+      }
+
+      .l2-card {
+        border-top: 4px solid var(--card-color);
+        border-radius: var(--radius-md);
+        padding: 1.2rem;
+        transition: all 0.2s ease;
+      }
+
+      .l2-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 24px var(--shadow-color);
+      }
+
+      .l2-card h3 {
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0 0 0.4rem;
+        color: var(--card-color);
+      }
+
+      .l2-card .types {
+        margin-bottom: 0.7rem;
+      }
+      .l2-card .wf-name {
+        color: var(--text-faint);
+        font-size: 0.8rem;
+        margin: 0 0 0.8rem;
+      }
+
+      .l3-note {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        border-top: 1px dashed var(--border-color);
+        padding-top: 0.6rem;
+        margin-top: 0.5rem;
+      }
+
+      .depot-band {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        background: var(--bg-sunken);
+        position: relative;
+        margin-bottom: 2rem;
+      }
+
+      .depot-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .depot-card {
+        border-radius: var(--radius-md);
+        padding: 0.9rem;
+        text-align: center;
+        transition: all 0.2s ease;
+      }
+
+      .depot-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px var(--shadow-color);
+      }
+
+      /* Governance Table */
+      .gov-table-wrapper {
+        overflow-x: auto;
+        margin-top: 2rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+      }
+
+      .gov-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+        text-align: left;
+      }
+
+      .gov-table caption {
+        text-align: left;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding: 1rem;
+        color: var(--text-main);
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .gov-table th {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-faint);
+        padding: 0.75rem 1rem;
+        background: var(--bg-sunken);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .gov-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-muted);
+      }
+
+      .gov-table td.epic {
+        font-weight: 600;
+        color: var(--text-main);
+      }
+
+      .gov-table tr:last-child td {
+        border-bottom: none;
+      }
+      .gov-table tr:hover td {
+        background: var(--bg-card-hover);
+      }
+
+      /* Journey View Styling */
+      .journey-intro {
+        max-width: 48rem;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin: 0 0 2rem;
+      }
+
+      .journey-crossing {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.5rem;
+        margin: 1.2rem auto;
+        padding: 0.9rem 1.1rem;
+        background: var(--bg-sunken);
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius-md);
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .crossing-track {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+      }
+
+      .crossing-arrow {
+        color: var(--text-faint);
+        font-size: 1.1rem;
+      }
+      .crossing-text {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-align: center;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .journey-fork-head {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: var(--text-main);
+        margin: 2.2rem 0 1rem;
+      }
+
+      .journey-fork {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+        gap: 1.5rem;
+        align-items: start;
+      }
+
+      .journey-branch {
+        border-radius: var(--radius-lg);
+        padding: 1.3rem;
+        overflow-x: auto;
+        max-width: 100%;
+      }
+
+      .journey-beat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        position: relative;
+        z-index: 2;
+        flex-shrink: 0;
+      }
+
+      .journey-note {
+        font-size: 0.83rem;
+        color: var(--text-muted);
+        width: 100%;
+        max-width: 100%;
+        text-align: left;
+        margin: 0.35rem 0 0 0;
+        line-height: 1.45;
+        box-sizing: border-box;
+      }
+
+      .journey-loop {
+        margin-top: 1rem;
+        font-size: 0.82rem;
+        color: var(--text-faint);
+        font-style: italic;
+      }
+
+      /* Glossary abbr styling */
+      abbr.gloss {
+        text-decoration: underline dotted var(--wf-story);
+        cursor: help;
+        font-weight: 500;
+      }
+
+      .credit {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-faint);
+        font-size: 0.82rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .credit-main-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      .credit-author-line {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        width: 100%;
+        margin-top: 0.4rem;
+      }
+
+      .author-link {
+        color: var(--wf-story, #3b82f6);
+        font-weight: 700;
+        text-decoration: none;
+        transition:
+          color 0.2s ease,
+          text-shadow 0.2s ease;
+      }
+
+      .author-link:hover {
+        color: #38bdf8;
+        text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+      }
+
+      /* Staggered Animations & Mobile Responsive Styles */
+      @keyframes fadeSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fade {
+        animation: fadeSlideIn 0.35s ease cubic-bezier(0.4, 0, 0.2, 1) both;
+      }
+
+      @media (max-width: 768px) {
+        .wrap {
+          padding: 1rem 0.8rem 3rem;
+        }
+        .header-main-row {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 1rem;
+        }
+        .search-box {
+          width: 100%;
+        }
+        .vertical-circuit {
+          padding: 1rem 0.8rem;
+        }
+        .journey-fork {
+          grid-template-columns: 1fr !important;
+        }
+        .journey-parallel-grid {
+          grid-template-columns: 1fr !important;
+          gap: 0.8rem !important;
+        }
+        .parallel-arrow {
+          transform: rotate(90deg);
+          margin: 0.5rem 0;
+        }
+        .siding-groups {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-main-row">
+          <div class="title-area">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Bunkai · BK · Jira + Xray Cloud</p>
+            <h1>Mapa de Workflows QA</h1>
+            <p class="subhead">
+              Este proyecto se gobierna por <b>9 workflows interconectados</b> (uno por cada familia
+              de issue type), con sus propias estaciones, reglas de movimiento y vinculación con la
+              metodología QA.
+            </p>
+          </div>
+
+          <div class="header-actions">
+            <div class="search-box">
+              <svg
+                class="search-icon"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <input
+                type="text"
+                id="global-search"
+                class="search-input"
+                placeholder="Buscar estado o skill QA..."
+                autocomplete="off"
+              />
+              <kbd class="cmd-k-badge" title="Presioná ⌘K o Ctrl+K para buscar">⌘K</kbd>
+
+              <!-- Indexed Search Dropdown -->
+              <div id="search-dropdown" class="search-results-dropdown"></div>
+            </div>
+
+            <!-- Sun / Moon Theme Toggle Icon Button -->
+            <button id="theme-btn" class="theme-toggle-icon" title="Cambiar Tema (Claro / Oscuro)">
+              <!-- Dynamic Sun/Moon SVG rendered by JS -->
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs-wrapper glass" id="tabs"></nav>
+
+      <!-- Main Content Grid -->
+      <div class="workspace-grid" id="workspace-grid">
+        <main id="panel"></main>
+        <aside id="drawer-container"></aside>
+      </div>
+
+      <footer class="bottom-footer" style="margin-top: 3rem">
+        <!-- Glossary drawer in Footer -->
+        <details class="glossary-details" id="glossary-section">
+          <summary class="glossary-summary">
+            <span>Glosario de Siglas Metodológicas (QA & Agile)</span>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </summary>
+          <dl class="glossary-grid" id="glossary-list"></dl>
+        </details>
+
+        <div class="credit">
+          <div class="credit-main-line">
+            <span
+              >Refleja el <b>Workflow Scheme real</b> configurado en Jira Cloud para Bunkai.</span
+            >
+            <code>Fuente: .agents/jira-workflows.json & project.yaml</code>
+          </div>
+          <div class="credit-author-line">
+            Crafted with ❤️ by
+            <a
+              href="https://github.com/alcalacar"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="author-link"
+              >alcalacar</a
+            >
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var ANY = '*';
+        var selectedStationKey = null;
+
+        var WORKFLOWS = [
+          {
+            id: 'epic',
+            group: 'board',
+            levelLabel: 'Nivel 1 · Contenedor',
+            label: 'Epic',
+            issueTypes: ['Epic'],
+            workflowName: 'UPEX Epic Workflow',
+            color: 'var(--wf-epic)',
+            statuses: {
+              backlog: { name: 'Backlog', category: 'new' },
+              planning: { name: 'Planning', category: 'working' },
+              in_progress: { name: 'In Progress', category: 'working' },
+              done: { name: 'Done', category: 'done' },
+              aborted: { name: 'ABORTED', category: 'done', exception: true },
+            },
+            main: [
+              { key: 'backlog' },
+              { key: 'planning', via: 'plan' },
+              { key: 'in_progress', via: 'ready to work' },
+              { key: 'done', via: 'complete' },
+            ],
+            sidings: [{ from: ANY, to: 'aborted', label: 'ABORTED', exception: true }],
+          },
+          {
+            id: 'story',
+            group: 'board',
+            levelLabel: 'Nivel 2 · Tablero',
+            label: 'Story',
+            issueTypes: ['Story'],
+            workflowName: 'UPEX Feature (US) Workflow',
+            color: 'var(--wf-story)',
+            statuses: {
+              backlog: { name: 'Backlog', category: 'new' },
+              shift_left_qa: { name: 'Shift-Left QA', category: 'working' },
+              estimation: { name: 'Estimation', category: 'working' },
+              ready_for_dev: { name: 'Ready For Dev', category: 'new' },
+              in_progress: { name: 'In Progress', category: 'working' },
+              in_review: { name: 'In Review', category: 'working' },
+              ready_for_qa: { name: 'Ready For QA', category: 'new' },
+              in_test: { name: 'In Test', category: 'working' },
+              blocked: { name: 'BLOCKED', category: 'new', exception: true },
+              qa_approved: { name: 'QA Approved', category: 'done' },
+              ready_for_release: { name: 'Ready For Release', category: 'done' },
+              deployed_to_production: { name: 'Deployed to Production', category: 'done' },
+              aborted: { name: 'ABORTED', category: 'done', exception: true },
+            },
+            main: [
+              { key: 'backlog' },
+              { key: 'shift_left_qa', via: 'analyze' },
+              { key: 'estimation', via: 'estimate' },
+              { key: 'ready_for_dev', via: 'estimated & ready' },
+              { key: 'in_progress', via: 'start working' },
+              { key: 'in_review', via: 'pull request' },
+              { key: 'ready_for_qa', via: 'deployed' },
+              { key: 'in_test', via: 'start testing' },
+              { key: 'qa_approved', via: 'QA sign-off' },
+              { key: 'ready_for_release', via: 'include in release' },
+              { key: 'deployed_to_production', via: 'released' },
+            ],
+            sidings: [
+              { from: 'backlog', to: 'estimation', label: 'ready to estimate' },
+              { from: 'estimation', to: 'shift_left_qa', label: 'needs quality' },
+              { from: 'estimation', to: 'backlog', label: 'back' },
+              { from: 'shift_left_qa', to: 'backlog', label: 'back' },
+              { from: 'in_progress', to: 'ready_for_qa', label: 'pushed' },
+              { from: 'in_progress', to: 'ready_for_dev', label: 'back' },
+              { from: 'in_test', to: 'ready_for_qa', label: 'back' },
+              { from: 'in_test', to: 'blocked', label: 'defect reported', exception: true },
+              { from: 'blocked', to: 'in_progress', label: 'fix defect', exception: true },
+              { from: 'blocked', to: 'ready_for_dev', label: 'back to dev', exception: true },
+              { from: 'blocked', to: 'in_test', label: 'back', exception: true },
+              { from: 'qa_approved', to: 'in_test', label: 'back' },
+              { from: 'aborted', to: 'ready_for_dev', label: 'recover', exception: true },
+              { from: ANY, to: 'aborted', label: 'ABORTED', exception: true },
+            ],
+          },
+          {
+            id: 'bug',
+            group: 'board',
+            levelLabel: 'Nivel 2 · Tablero',
+            label: 'Bug / Defect',
+            issueTypes: ['Bug', 'Defect', 'Improvement'],
+            workflowName: 'UPEX BUG/DEFECT LIFE CYCLE',
+            color: 'var(--wf-bug)',
+            statuses: {
+              open: { name: 'Open', category: 'new' },
+              in_progress: { name: 'In Progress', category: 'working' },
+              in_review: { name: 'In Review', category: 'working' },
+              ready_for_qa: { name: 'Ready For QA', category: 'new' },
+              closed: { name: 'Closed', category: 'done' },
+              cannot_reproduce: { name: 'Cannot Reproduce', category: 'done', exception: true },
+              duplicated: { name: 'Duplicated', category: 'done', exception: true },
+              rejected: { name: 'REJECTED', category: 'done', exception: true },
+              deferred: { name: 'Deferred', category: 'working', exception: true },
+              enhancement: { name: 'Enhancement', category: 'done', exception: true },
+              aborted: { name: 'ABORTED', category: 'done', exception: true },
+            },
+            main: [
+              { key: 'open' },
+              { key: 'in_progress', via: 'start fixing' },
+              { key: 'in_review', via: 'pull request' },
+              { key: 'ready_for_qa', via: 'fixed & deployed' },
+              { key: 'closed', via: 'retest passed' },
+            ],
+            sidings: [
+              { from: 'open', to: 'cannot_reproduce', label: 'is CNR', exception: true },
+              { from: 'open', to: 'deferred', label: 'defer', exception: true },
+              { from: 'deferred', to: 'in_progress', label: 'resume fix', exception: true },
+              { from: 'open', to: 'duplicated', label: 'is duplicated', exception: true },
+              { from: 'open', to: 'rejected', label: 'is WAD', exception: true },
+              { from: 'open', to: 'enhancement', label: 'is not a Bug', exception: true },
+              { from: 'in_progress', to: 'ready_for_qa', label: 'hard pushed' },
+              { from: 'closed', to: 'ready_for_qa', label: 'back' },
+              { from: ANY, to: 'open', label: 'Re-Open', exception: true },
+              { from: ANY, to: 'aborted', label: 'ABORTED', exception: true },
+            ],
+          },
+          {
+            id: 'tech',
+            group: 'board',
+            levelLabel: 'Nivel 2 · Tablero',
+            label: 'Tech Story / Debt',
+            issueTypes: ['Tech Story', 'Tech Debt'],
+            workflowName: 'UPEX Tech Task/Debt (TD) Workflow',
+            color: 'var(--wf-tech)',
+            statuses: {
+              to_do: { name: 'To Do', category: 'new' },
+              in_progress: { name: 'In Progress', category: 'working' },
+              in_review: { name: 'In Review', category: 'working' },
+              fixed: { name: 'FIXED', category: 'done' },
+              automated: { name: 'AUTOMATED', category: 'done' },
+              completed: { name: 'Completed', category: 'done' },
+              blocked: { name: 'BLOCKED', category: 'new', exception: true },
+              aborted: { name: 'ABORTED', category: 'done', exception: true },
+            },
+            main: [
+              { key: 'to_do' },
+              { key: 'in_progress', via: 'start working' },
+              { key: 'in_review', via: 'ready' },
+              { key: 'completed', via: 'complete' },
+            ],
+            sidings: [
+              { from: 'in_progress', to: 'to_do', label: 'renew' },
+              { from: 'in_progress', to: 'aborted', label: 'abort', exception: true },
+              { from: 'in_progress', to: 'blocked', label: 'blocked', exception: true },
+              { from: 'blocked', to: 'in_progress', label: 'recover', exception: true },
+              { from: 'in_review', to: 'fixed', label: 'fix' },
+              { from: 'in_review', to: 'automated', label: 'test finished' },
+              { from: 'in_review', to: 'in_progress', label: 'recover' },
+              { from: 'fixed', to: 'in_review', label: 'back' },
+              { from: 'automated', to: 'in_review', label: 'back' },
+              { from: 'completed', to: 'in_review', label: 'back' },
+              { from: 'aborted', to: 'to_do', label: 'recovered', exception: true },
+            ],
+          },
+          {
+            id: 'tc',
+            group: 'xray',
+            levelLabel: 'Depósito Xray',
+            label: 'Test (TC)',
+            issueTypes: ['Test'],
+            workflowName: 'UPEX Test (TC) Workflow',
+            color: 'var(--wf-tc)',
+            statuses: {
+              draft: { name: 'Draft', category: 'new' },
+              in_design: { name: 'In Design', category: 'working' },
+              ready: { name: 'READY', category: 'done' },
+              in_review: { name: 'In Review', category: 'working' },
+              candidate: { name: 'Candidate', category: 'new' },
+              manual: { name: 'MANUAL', category: 'done' },
+              in_automation: { name: 'In Automation', category: 'working' },
+              pull_request: { name: 'Pull Request', category: 'working' },
+              automated: { name: 'AUTOMATED', category: 'done' },
+              deprecated: { name: 'DEPRECATED', category: 'done', exception: true },
+            },
+            main: [
+              { key: 'draft' },
+              { key: 'in_design', via: 'start design' },
+              { key: 'ready', via: 'ready to run' },
+              { key: 'in_review', via: 'automation review' },
+              { key: 'candidate', via: 'approve to automate' },
+              { key: 'in_automation', via: 'start automation' },
+              { key: 'pull_request', via: 'create PR' },
+              { key: 'automated', via: 'merged' },
+            ],
+            sidings: [
+              { from: 'draft', to: 'in_review', label: 'automation review' },
+              { from: 'in_design', to: 'draft', label: 'back' },
+              { from: 'ready', to: 'manual', label: 'for manual' },
+              { from: 'ready', to: 'in_design', label: 'back' },
+              { from: 'in_review', to: 'ready', label: 'back' },
+              { from: 'candidate', to: 'manual', label: 'manual execution' },
+              { from: 'candidate', to: 'in_review', label: 'back' },
+              { from: 'in_automation', to: 'candidate', label: 'back' },
+              { from: 'pull_request', to: 'in_automation', label: 'back' },
+              { from: 'automated', to: 'manual', label: 'manual execution' },
+              { from: 'automated', to: 'pull_request', label: 'fix' },
+              { from: 'manual', to: 'in_review', label: 'automation review' },
+              { from: 'manual', to: 'candidate', label: 'for automation' },
+              { from: 'manual', to: 'automated', label: 'automated' },
+              { from: 'deprecated', to: 'draft', label: 'recover', exception: true },
+              { from: ANY, to: 'deprecated', label: 'Deprecated', exception: true },
+            ],
+          },
+          {
+            id: 'plan',
+            group: 'xray',
+            levelLabel: 'Depósito Xray',
+            label: 'Test Plan',
+            issueTypes: ['Test Plan'],
+            workflowName: 'UPEX Test Planning Workflow',
+            color: 'var(--wf-plan)',
+            statuses: {
+              planning: { name: 'Planning', category: 'working' },
+              ready: { name: 'READY', category: 'done' },
+              plan_automated: { name: 'Plan Automated', category: 'done' },
+              completed: { name: 'Completed', category: 'done' },
+            },
+            main: [
+              { key: 'planning' },
+              { key: 'ready', via: 'designed' },
+              { key: 'completed', via: 'complete' },
+            ],
+            sidings: [
+              { from: ANY, to: 'plan_automated', label: 'planned' },
+              { from: 'plan_automated', to: 'ready', label: 'ready to execute' },
+            ],
+          },
+          {
+            id: 'exec',
+            group: 'xray',
+            levelLabel: 'Nivel 3 · Subtarea',
+            label: 'Test Execution',
+            issueTypes: ['Test Execution', 'Re-Test Execution'],
+            workflowName: 'UPEX Subtask/TX Workflow',
+            color: 'var(--wf-exec)',
+            statuses: {
+              active: { name: 'ACTIVE', category: 'working' },
+              close: { name: 'Close', category: 'done' },
+            },
+            main: [{ key: 'active' }, { key: 'close', via: 'complete' }],
+            sidings: [{ from: 'close', to: 'active', label: 'reactive' }],
+          },
+          {
+            id: 'set',
+            group: 'xray',
+            levelLabel: 'Depósito Xray',
+            label: 'Test Set',
+            issueTypes: ['Test Set'],
+            workflowName: 'UPEX Test Suite (TS) Workflow',
+            color: 'var(--wf-set)',
+            statuses: {
+              designing: { name: 'Designing', category: 'working' },
+              close: { name: 'Close', category: 'done' },
+            },
+            main: [{ key: 'designing' }, { key: 'close', via: 'done' }],
+            sidings: [{ from: 'close', to: 'designing', label: 'error', exception: true }],
+          },
+          {
+            id: 'pre',
+            group: 'xray',
+            levelLabel: 'Depósito Xray',
+            label: 'Precondition',
+            issueTypes: ['Precondition'],
+            workflowName: 'UPEX Active Item Workflow',
+            color: 'var(--wf-pre)',
+            statuses: {
+              active: { name: 'ACTIVE', category: 'working' },
+            },
+            main: [{ key: 'active' }],
+            sidings: [],
+          },
+        ];
+
+        var byId = {};
+        WORKFLOWS.forEach(function (w) {
+          byId[w.id] = w;
+        });
+
+        function esc(s) {
+          return String(s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+          });
+        }
+
+        var GLOSSARY = {
+          AC: 'Acceptance Criteria — criterio de aceptación',
+          ATP: 'Acceptance Test Plan — plan de pruebas de aceptación de la Story',
+          ATR: 'Acceptance Test Results — resultados de la ejecución de esas pruebas',
+          ATC: 'Automated Test Case — caso de prueba escrito como código (arquitectura KATA)',
+          TC: 'Test Case — caso de prueba, el issue type "Test" en Xray',
+          ROI: 'Return on Investment — fórmula que decide si un caso se automatiza',
+          TMS: 'Test Management System — el repositorio de casos de prueba (Jira/Xray)',
+          PBI: 'Product Backlog Item — ítem del backlog (Epic, Story, Bug, etc.)',
+          UI: 'User Interface — interfaz visual de la app',
+          API: 'Application Programming Interface — capa de servicios/backend',
+          DB: 'Database — base de datos',
+          'CI/CD':
+            'Continuous Integration / Continuous Deployment — pipeline automático de build y despliegue',
+          FTP: 'Feature Test Plan — plan de pruebas a nivel Epic/feature',
+          STP: 'Sprint Test Plan — plan de pruebas de regresión del sprint',
+          KATA: 'Component Action Test Architecture — la arquitectura de este framework',
+          CNR: 'Cannot Reproduce — no se pudo reproducir el defecto',
+          WAD: 'Works As Designed — funciona como fue diseñado, no es un bug',
+          PR: 'Pull Request',
+          QA: 'Quality Assurance — aseguramiento de calidad',
+        };
+
+        var GLOSSARY_KEYS = Object.keys(GLOSSARY).sort(function (a, b) {
+          return b.length - a.length;
+        });
+        var GLOSSARY_RE = new RegExp(
+          '\\b(' +
+            GLOSSARY_KEYS.map(function (k) {
+              return k.replace(/\//g, '\\/');
+            }).join('|') +
+            ')s?\\b',
+          'g'
+        );
+
+        function glossify(html) {
+          return html.replace(GLOSSARY_RE, function (match, base) {
+            return (
+              '<abbr class="gloss" title="' +
+              GLOSSARY[base].replace(/"/g, '&quot;') +
+              '">' +
+              match +
+              '</abbr>'
+            );
+          });
+        }
+
+        var TYPE_ICONS = {
+          Epic: '<path d="M8.8 2 4.2 9h3l-1 5 5.6-7.4H8.4L8.8 2z"/>',
+          Story: '<path d="M4.6 3h6.8v10.2L8 10.6l-3.4 2.6V3z"/>',
+          Bug: '<g><circle cx="8" cy="9.2" r="2.9" stroke="none"/><circle cx="8" cy="5" r="1.1" stroke="none"/><path d="M5.6 9.2H3.4M12.6 9.2h-2.2M6 11.6l-1.6 1.6M10 11.6l1.6 1.6M6 6.9 4.7 5.6M10 6.9l1.3-1.3" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="round"/></g>',
+          Defect:
+            '<path d="M8 3.2 13.2 12.4H2.8L8 3.2z"/><rect x="7.35" y="6.6" width="1.3" height="3" rx="0.6" fill="{{BG}}"/><rect x="7.35" y="10.4" width="1.3" height="1.3" rx="0.65" fill="{{BG}}"/>',
+          Improvement:
+            '<path d="M8 3.2a3.4 3.4 0 0 0-1.9 6.2c.4.28.6.66.6 1.02v.36h2.6v-.36c0-.36.2-.74.6-1.02A3.4 3.4 0 0 0 8 3.2z"/><rect x="6.7" y="11.6" width="2.6" height="0.9" rx="0.35"/><rect x="7" y="12.8" width="2" height="0.8" rx="0.3"/>',
+          'Tech Story':
+            '<path d="M4.6 8.4 7 10.8l4.4-5.6" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+          'Tech Debt':
+            '<rect x="4" y="4.4" width="8" height="1.6" rx="0.6"/><rect x="4" y="7.2" width="8" height="1.6" rx="0.6" opacity="0.75"/><rect x="4" y="10" width="8" height="1.6" rx="0.6" opacity="0.5"/>',
+          Test: '<path d="M6.6 3h2.8v3.4l2.6 5.6c.4.9-.3 1.9-1.3 1.9H5.3c-1 0-1.7-1-1.3-1.9l2.6-5.6V3z" fill="none" stroke="#fff" stroke-width="1.1" stroke-linejoin="round"/><rect x="6.6" y="2.6" width="2.8" height="0.9" rx="0.3"/>',
+          'Test Plan':
+            '<rect x="4.2" y="3.6" width="7.6" height="10" rx="1" fill="none" stroke="#fff" stroke-width="1.1"/><rect x="6.2" y="2.6" width="3.6" height="1.6" rx="0.5"/><path d="M5.8 7h4.4M5.8 9.2h4.4M5.8 11.4h2.8" stroke="#fff" stroke-width="1" stroke-linecap="round"/>',
+          'Test Execution': '<path d="M5.6 3.8v8.4l7-4.2-7-4.2z"/>',
+          'Re-Test Execution':
+            '<path d="M5.6 3.8v8.4l7-4.2-7-4.2z"/><path d="M3.2 5.4a4 4 0 1 1 0 5.2" fill="none" stroke="#fff" stroke-width="0.9" stroke-linecap="round"/>',
+          'Test Set':
+            '<rect x="3.6" y="6.4" width="6" height="6" rx="1" fill="none" stroke="#fff" stroke-width="1.1" opacity="0.55"/><rect x="6.2" y="3.8" width="6" height="6" rx="1" fill="none" stroke="#fff" stroke-width="1.1"/>',
+          Precondition:
+            '<path d="M5.4 2.6v11.6" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><path d="M5.4 3.2h6.2l-1.6 2.4 1.6 2.4H5.4V3.2z"/>',
+        };
+
+        function typeIcon(typeName, colorVar) {
+          var glyph = TYPE_ICONS[typeName];
+          if (!glyph) return '';
+          glyph = glyph.split('{{BG}}').join(colorVar);
+          return (
+            '<svg class="type-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">' +
+            '<rect width="16" height="16" rx="3.5" style="fill:' +
+            colorVar +
+            '"></rect>' +
+            '<g fill="#fff">' +
+            glyph +
+            '</g></svg>'
+          );
+        }
+
+        function typeChip(t, colorVar) {
+          return (
+            '<span class="chip-type">' +
+            typeIcon(t, colorVar) +
+            '<span>' +
+            esc(t) +
+            '</span></span>'
+          );
+        }
+
+        function formatStatusName(str) {
+          if (!str) return '';
+          var s = String(str).trim();
+          if (s.toUpperCase() === 'ABORTED') return 'Aborted';
+          if (s.toUpperCase() === 'REJECTED') return 'Rejected';
+          if (s.toUpperCase() === 'BLOCKED') return 'Blocked';
+          if (s.toUpperCase() === 'FIXED') return 'Fixed';
+          if (s.toUpperCase() === 'AUTOMATED') return 'Automated';
+
+          return s
+            .split(' ')
+            .map(function (w) {
+              if (!w) return '';
+              var lower = w.toLowerCase();
+              if (lower === 'qa') return 'QA';
+              if (lower === 'dev') return 'Dev';
+              if (lower === 'us') return 'US';
+              if (lower === 'tc') return 'TC';
+              return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            })
+            .join(' ');
+        }
+
+        var CATEGORY_LABELS = {
+          new: 'new — todavía no arrancó',
+          working: 'Working — en curso',
+          done: 'done — terminado',
+        };
+
+        var METHOD_MAP = {
+          story: {
+            shift_left_qa: {
+              skill: '/shift-left-testing',
+              stage: 'Stage 0',
+              text: 'Refina las ACs y arma el ATP DRAFT antes de que la Story entre al sprint — previene defectos en el requerimiento, no los detecta después.',
+            },
+            ready_for_qa: {
+              skill: '/sprint-testing',
+              stage: 'Stage 1',
+              text: 'Arranca la Planning: se lee el PBI sincronizado, se explora el código y se arma el plan de sesión.',
+            },
+            in_test: {
+              skill: '/sprint-testing',
+              stage: 'Stages 2-3',
+              text: 'Ejecución manual (smoke + trifuerza UI/API/DB) y reporting — se producen el ATR y los bug reports si algo falla.',
+            },
+            qa_approved: {
+              skill: '/test-documentation',
+              stage: 'Stage 4',
+              text: 'Los casos ejecutados se documentan en el TMS y se puntúa ROI: Candidate, Manual o Deferred.',
+            },
+            deployed_to_production: {
+              skill: '/regression-testing',
+              stage: 'Stage 6',
+              text: 'Entra al radar de la suite de regresión que corre en CI/CD.',
+            },
+          },
+          bug: {
+            open: {
+              skill: '/sprint-testing',
+              stage: 'Stage 2',
+              text: 'Triage con el árbol de decisión veto + risk-score de la doctrina de gestión de defectos.',
+            },
+            ready_for_qa: {
+              skill: '/sprint-testing',
+              stage: 'Stage 2',
+              text: 'Retest del fix — mismo flujo de ejecución manual que una Story.',
+            },
+          },
+          tc: {
+            draft: {
+              skill: '/sprint-testing',
+              stage: 'Stage 1',
+              text: 'Nace acá como artefacto de ejecución del sprint (modalidad jira-xray) — se crea y corre durante la Story, antes de cualquier scoring de ROI.',
+            },
+            in_review: {
+              skill: '/test-documentation',
+              stage: 'Stage 4',
+              text: '"Automation review": arranca la sesión de ROI (Analyze → Prioritize) sobre el Test que ya se ejecutó en el sprint.',
+            },
+            candidate: {
+              skill: '/test-documentation',
+              stage: 'Stage 4',
+              text: 'Verdict de esa misma sesión: Candidate (el otro verdict posible es Manual, ver ramales) → se promueve al Test Plan de regresión y se enriquece el Gherkin. No es una invocación nueva del skill.',
+            },
+            in_automation: {
+              skill: '/test-automation',
+              stage: 'Stage 5',
+              text: 'Se escribe como ATC en KATA + Playwright + TypeScript, con Plan → Code → Review.',
+            },
+            automated: {
+              skill: '/regression-testing',
+              stage: 'Stage 6',
+              text: 'Corre junto al resto de los ATC en la suite de regresión de CI/CD.',
+            },
+          },
+          exec: {
+            active: {
+              skill: '/sprint-testing',
+              stage: 'Stages 2-3',
+              text: 'Corrida manual (o disparada por CI una vez automatizada) — el resultado alimenta el ATR de la Story.',
+            },
+          },
+          plan: {
+            planning: {
+              skill: '/test-documentation',
+              stage: 'Stage 4',
+              text: 'El Test Plan (FTP/STP/ATP) se arma acá, como resultado del scoring de ROI de Stage 4.',
+            },
+            ready: {
+              skill: '/test-automation',
+              stage: 'Stage 5',
+              text: 'Plan listo para ejecutarse — referencia mientras se automatizan sus Test (TC).',
+            },
+          },
+        };
+
+        function renderMain(wf) {
+          var html =
+            '<div class="vertical-circuit glass" style="--wf-color:' +
+            wf.color +
+            '">' +
+            '<div class="vertical-steps">';
+
+          var currentPhase = 0;
+
+          wf.main.forEach(function (node, idx) {
+            var st = wf.statuses[node.key];
+            var phaseTitle = '';
+
+            if (wf.id === 'story') {
+              if (idx === 0) {
+                phaseTitle = 'Fase 1: Shift-Left QA & Estimación (Stage 0)';
+              } else if (node.key === 'ready_for_dev') {
+                phaseTitle = 'Fase 2: Construcción & Revisión de Código';
+              } else if (node.key === 'ready_for_qa') {
+                phaseTitle = 'Fase 3: Pruebas en Sprint, Regresión & Entrega (Stages 1-3, 6)';
+              }
+            } else if (wf.id === 'tc') {
+              if (idx === 0) {
+                phaseTitle = 'Fase 1: Diseño en Sprint (Stages 1-3)';
+              } else if (node.key === 'in_review') {
+                phaseTitle = 'Fase 2: Documentación TMS & Scoring ROI (Stage 4)';
+              } else if (node.key === 'in_automation') {
+                phaseTitle = 'Fase 3: Automatización KATA & Regresión CI/CD (Stages 5-6)';
+              }
+            } else if (wf.id === 'bug') {
+              if (idx === 0) {
+                phaseTitle = 'Fase 1: Triage & Diagnóstico (Stage 2/3)';
+              } else if (node.key === 'in_progress') {
+                phaseTitle = 'Fase 2: Corrección & Code Review';
+              } else if (node.key === 'ready_for_qa') {
+                phaseTitle = 'Fase 3: Retest QA & Cierre de Defecto';
+              }
+            } else if (wf.id === 'tech') {
+              if (idx === 0) {
+                phaseTitle = 'Fase 1: Refinamiento de Deuda Técnica';
+              } else if (node.key === 'in_progress') {
+                phaseTitle = 'Fase 2: Construcción, Review & Cierre';
+              }
+            } else if (wf.id === 'epic') {
+              if (idx === 0) {
+                phaseTitle = 'Fase 1: Ingesta & Planificación del Épico';
+              } else if (node.key === 'in_progress') {
+                phaseTitle = 'Fase 2: Ejecución & Cierre del Épico';
+              }
+            } else if (wf.id === 'plan') {
+              if (idx === 0) {
+                phaseTitle = 'Fase 1: Estructuración del Test Plan (Stage 4)';
+              } else if (node.key === 'ready') {
+                phaseTitle = 'Fase 2: Cobertura de Regresión (Stage 6)';
+              }
+            } else if (wf.id === 'exec') {
+              if (idx === 0) {
+                phaseTitle = 'Fase 1: Invocación & Ejecución (Stages 2-3 / 6)';
+              }
+            } else if (wf.main.length >= 4) {
+              if (idx === 0) {
+                currentPhase = 1;
+                phaseTitle = 'Fase 1: Ingesta & Preparación';
+              } else if (
+                currentPhase === 1 &&
+                (st.category === 'working' ||
+                  node.key === 'ready_for_dev' ||
+                  node.key === 'in_progress')
+              ) {
+                currentPhase = 2;
+                phaseTitle = 'Fase 2: Desarrollo & Ejecución';
+              } else if (
+                currentPhase === 2 &&
+                (st.category === 'done' ||
+                  node.key === 'qa_approved' ||
+                  node.key === 'ready_for_qa')
+              ) {
+                currentPhase = 3;
+                phaseTitle = 'Fase 3: Verificación QA & Cierre';
+              }
+            }
+
+            var phaseDividerHtml = phaseTitle
+              ? '<div class="v-phase-divider"><span class="v-phase-badge">' +
+                esc(phaseTitle) +
+                '</span><span class="v-phase-line"></span></div>'
+              : '';
+
+            var outgoing = wf.sidings.filter(function (s) {
+              return s.from === node.key;
+            });
+            var incoming = wf.sidings.filter(function (s) {
+              return s.to === node.key;
+            });
+            var methodInfo = METHOD_MAP[wf.id] && METHOD_MAP[wf.id][node.key];
+            var hasDetail = outgoing.length > 0 || incoming.length > 0 || Boolean(methodInfo);
+
+            var cls = ['v-station-card'];
+            if (!hasDetail) cls.push('is-static');
+            if (st.exception) cls.push('is-exception');
+            if (methodInfo) cls.push('has-method');
+            if (hasDetail && selectedStationKey === node.key) cls.push('is-selected');
+
+            var catLabel =
+              st.category === 'new'
+                ? 'Inicio'
+                : st.category === 'working'
+                  ? 'En curso'
+                  : 'Completado';
+
+            var formattedName = formatStatusName(st.name);
+
+            var robotIcon =
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="16" y1="16" x2="16" y2="16.01"/></svg>';
+
+            var methodTag = methodInfo
+              ? '<span class="v-agent-pill" title="Regla de metodología QA agéntica asociada">' +
+                robotIcon +
+                'Agentic QA</span>'
+              : '';
+
+            var eyebrowVia = node.via
+              ? '<span class="v-via-eyebrow">via: ' + esc(node.via) + ' →</span>'
+              : '';
+
+            var chevronHtml = hasDetail
+              ? '<span class="v-chevron" title="Hacé clic para inspeccionar detalles">▾</span>'
+              : '';
+
+            var delayStyle = 'style="animation-delay: ' + (idx * 0.04).toFixed(2) + 's;"';
+
+            var cardAttrs = hasDetail ? 'data-key="' + esc(node.key) + '"' : '';
+
+            var inlineInspectorHtml = hasDetail
+              ? '<div class="v-inline-inspector' +
+                (selectedStationKey === node.key ? ' is-open' : '') +
+                '" id="v-inspector-' +
+                esc(node.key) +
+                '">' +
+                (selectedStationKey === node.key ? renderStationDetail(wf, node.key) : '') +
+                '</div>'
+              : '';
+
+            html +=
+              phaseDividerHtml +
+              '<div class="v-step-item animate-fade" ' +
+              delayStyle +
+              '>' +
+              '<div class="v-step-row">' +
+              '<div class="v-node-dot-wrap"><span class="v-node-number">' +
+              (idx + 1) +
+              '</span><span class="v-node-dot cat-' +
+              st.category +
+              (st.exception ? ' is-exception' : '') +
+              '"></span></div>' +
+              '<div class="v-card-col">' +
+              '<div class="' +
+              cls.join(' ') +
+              '" ' +
+              cardAttrs +
+              '>' +
+              '<div class="v-card-top">' +
+              '<div class="v-card-main-col">' +
+              eyebrowVia +
+              '<span class="v-station-name">' +
+              esc(formattedName) +
+              '</span>' +
+              '</div>' +
+              '<div class="v-card-badges">' +
+              methodTag +
+              '<span class="v-cat-badge cat-' +
+              st.category +
+              '">' +
+              esc(catLabel) +
+              '</span>' +
+              chevronHtml +
+              '</div>' +
+              '</div>' +
+              '</div>' +
+              inlineInspectorHtml +
+              '</div>' +
+              '</div>' +
+              '</div>';
+          });
+
+          html += '</div></div>';
+          return html;
+        }
+
+        function renderMethodSection(wf, key) {
+          var m = METHOD_MAP[wf.id] && METHOD_MAP[wf.id][key];
+          if (!m) return '';
+          return (
+            '<div class="station-detail-section station-detail-method">' +
+            '<h4>Metodología QA</h4>' +
+            '<div class="method-badge-row"><span class="method-badge">' +
+            esc(m.skill) +
+            '</span>' +
+            '<span class="method-stage">' +
+            esc(m.stage) +
+            '</span></div>' +
+            '<p class="method-text">' +
+            glossify(esc(m.text)) +
+            '</p></div>'
+          );
+        }
+
+        function getStepNumber(wf, statusKey) {
+          if (!wf || !wf.main || statusKey === ANY) return '';
+          for (var i = 0; i < wf.main.length; i++) {
+            if (wf.main[i].key === statusKey) {
+              return i + 1;
+            }
+          }
+          return '';
+        }
+
+        function getStepChip(wf, statusKey) {
+          var num = getStepNumber(wf, statusKey);
+          return num ? '<span class="step-chip">#' + num + '</span>' : '';
+        }
+
+        function renderStationDetail(wf, key) {
+          var st = wf.statuses[key];
+          var outgoing = wf.sidings.filter(function (s) {
+            return s.from === key;
+          });
+          var incoming = wf.sidings.filter(function (s) {
+            return s.to === key;
+          });
+
+          var html = '';
+
+          // 1. LLEGADAS ALTERNATIVAS
+          if (incoming.length) {
+            html +=
+              '<div class="station-detail-section"><h4>Llegadas alternativas</h4>' +
+              '<ul class="station-detail-list">' +
+              incoming
+                .map(function (s) {
+                  var fromSt = s.from !== ANY ? wf.statuses[s.from] : null;
+                  var fromName = fromSt
+                    ? formatStatusName(fromSt.name)
+                    : s.from === ANY
+                      ? 'Cualquier estado'
+                      : s.from;
+                  var fromChip = getStepChip(wf, s.from);
+                  var excTag =
+                    s.exception || (fromSt && fromSt.exception)
+                      ? ' <span style="color:var(--exception)">✦</span>'
+                      : '';
+                  return (
+                    '<li><b>' +
+                    fromChip +
+                    esc(fromName) +
+                    excTag +
+                    '</b> <span>→</span> <span class="origin-via">' +
+                    esc(s.label) +
+                    '</span></li>'
+                  );
+                })
+                .join('') +
+              '</ul></div>';
+          }
+
+          // 2. SALIDAS ALTERNATIVAS
+          if (outgoing.length) {
+            html +=
+              '<div class="station-detail-section"><h4>Salidas alternativas desde acá</h4>' +
+              '<ul class="station-detail-list">' +
+              outgoing
+                .map(function (s) {
+                  var toSt = wf.statuses[s.to];
+                  var toName = toSt ? formatStatusName(toSt.name) : s.to;
+                  var toChip = getStepChip(wf, s.to);
+                  var excTag =
+                    s.exception || (toSt && toSt.exception)
+                      ? ' <span style="color:var(--exception)">✦</span>'
+                      : '';
+                  return (
+                    '<li><span class="origin-via">' +
+                    esc(s.label) +
+                    '</span> <span>→</span> ' +
+                    '<b>' +
+                    toChip +
+                    esc(toName) +
+                    excTag +
+                    '</b></li>'
+                  );
+                })
+                .join('') +
+              '</ul></div>';
+          }
+
+          // 3. METODOLOGÍA QA
+          html += renderMethodSection(wf, key);
+
+          return html;
+        }
+
+        function renderGroupGrid(sidingList, isExceptionSection, wf) {
+          if (!sidingList.length) return '';
+          var order = [];
+          var groups = {};
+          sidingList.forEach(function (s) {
+            if (!groups[s.to]) {
+              groups[s.to] = [];
+              order.push(s.to);
+            }
+            groups[s.to].push(s);
+          });
+
+          var CAT_RANK = { new: 1, working: 2, done: 3 };
+          order.sort(function (aKey, bKey) {
+            var aCat = wf.statuses[aKey] ? wf.statuses[aKey].category : 'new';
+            var bCat = wf.statuses[bKey] ? wf.statuses[bKey].category : 'new';
+            return (CAT_RANK[aCat] || 9) - (CAT_RANK[bCat] || 9);
+          });
+
+          return (
+            '<div class="siding-groups">' +
+            order
+              .map(function (toKey, idx) {
+                var toSt = wf.statuses[toKey];
+                var items = groups[toKey];
+                var isExcGroup = isExceptionSection || (toSt && toSt.exception);
+                var cls = 'siding-group animate-fade' + (isExcGroup ? ' is-exception' : '');
+                var delayStyle = 'style="animation-delay: ' + (idx * 0.04).toFixed(2) + 's;"';
+
+                var origins = items
+                  .map(function (s) {
+                    var fromName =
+                      s.from === ANY
+                        ? 'Cualquier estado'
+                        : wf.statuses[s.from]
+                          ? wf.statuses[s.from].name
+                          : s.from;
+                    var fromChip = getStepChip(wf, s.from);
+                    return (
+                      '<li><span class="origin-from">' +
+                      fromChip +
+                      esc(formatStatusName(fromName)) +
+                      '</span> <span class="origin-arrow">→</span> ' +
+                      '<span class="origin-via">' +
+                      esc(s.label) +
+                      '</span></li>'
+                    );
+                  })
+                  .join('');
+
+                var catName = toSt ? toSt.category : 'new';
+                var toName = toSt ? formatStatusName(toSt.name) : toKey;
+                var toChip = getStepChip(wf, toKey);
+
+                return (
+                  '<div class="' +
+                  cls +
+                  '" style="--wf-color:' +
+                  wf.color +
+                  '" ' +
+                  delayStyle +
+                  ' data-tokey="' +
+                  esc(toKey) +
+                  '">' +
+                  '<div class="siding-card-header">' +
+                  '<span class="siding-group-count">' +
+                  items.length +
+                  (items.length === 1 ? ' origen' : ' orígenes') +
+                  '</span>' +
+                  '</div>' +
+                  '<ul class="siding-origins">' +
+                  origins +
+                  '</ul>' +
+                  '<div class="siding-group-arrival"><span class="arrival-arrow cat-' +
+                  esc(catName) +
+                  '">↓</span>' +
+                  '<span class="siding-group-dot cat-' +
+                  esc(catName) +
+                  '"></span>' +
+                  '<span class="siding-group-to cat-' +
+                  esc(catName) +
+                  '">' +
+                  toChip +
+                  esc(toName) +
+                  '</span></div></div>'
+                );
+              })
+              .join('') +
+            '</div>'
+          );
+        }
+
+        /* Render sidings with smart category filters & zero empty states */
+        function renderSidings(wf) {
+          if (!wf.sidings.length) {
+            return (
+              '<div class="no-sidings-banner glass">' +
+              '<span class="no-sidings-icon">✓</span>' +
+              '<span><b>Flujo 100% Lineal:</b> Esta secuencia no posee desvíos ni ramales alternativos.</span>' +
+              '</div>'
+            );
+          }
+
+          var standardSidings = [];
+          var exceptionSidings = [];
+          var counts = { all: wf.sidings.length, new: 0, working: 0, done: 0, exception: 0 };
+
+          wf.sidings.forEach(function (s) {
+            var toSt = wf.statuses[s.to];
+            var isExc = s.exception || (toSt && toSt.exception);
+            if (isExc) {
+              exceptionSidings.push(s);
+              counts.exception++;
+            } else {
+              standardSidings.push(s);
+              if (toSt && counts[toSt.category] !== undefined) {
+                counts[toSt.category]++;
+              }
+            }
+          });
+
+          var activeCategories = 0;
+          if (counts.new) activeCategories++;
+          if (counts.working) activeCategories++;
+          if (counts.done) activeCategories++;
+          if (counts.exception) activeCategories++;
+
+          var filterBtns = '';
+          if (activeCategories > 1) {
+            filterBtns =
+              '<div class="sidings-filter-bar">' +
+              '<button class="siding-filter-btn active" data-filter="all">Todos (' +
+              counts.all +
+              ')</button>' +
+              (counts.new
+                ? '<button class="siding-filter-btn" data-filter="new">Inicio (' +
+                  counts.new +
+                  ')</button>'
+                : '') +
+              (counts.working
+                ? '<button class="siding-filter-btn" data-filter="working">En curso (' +
+                  counts.working +
+                  ')</button>'
+                : '') +
+              (counts.done
+                ? '<button class="siding-filter-btn" data-filter="done">Completado (' +
+                  counts.done +
+                  ')</button>'
+                : '') +
+              (counts.exception
+                ? '<button class="siding-filter-btn" data-filter="exception">Excepciones (' +
+                  counts.exception +
+                  ')</button>'
+                : '') +
+              '</div>';
+          }
+
+          var html = filterBtns;
+          if (standardSidings.length) {
+            html +=
+              '<p class="sidings-subhead">Ramales Estándar</p>' +
+              renderGroupGrid(standardSidings, false, wf);
+          }
+          if (exceptionSidings.length) {
+            html +=
+              '<p class="sidings-subhead is-exception"><span class="exc-symbol">✦</span> Salidas Excepcionales</p>' +
+              renderGroupGrid(exceptionSidings, true, wf);
+          }
+          return html;
+        }
+
+        function renderLegendBar() {
+          return (
+            '<div class="legend-bar glass" style="max-width: 780px; margin: 0 auto 1.5rem auto;">' +
+            '<span class="legend-item"><span class="legend-dot new"></span> Inicio (To Do)</span>' +
+            '<span class="legend-item"><span class="legend-dot working"></span> En curso (In Progress)</span>' +
+            '<span class="legend-item"><span class="legend-dot done"></span> Completado (Done)</span>' +
+            '<span class="legend-item"><span class="exc-symbol">✦</span> Salida Excepcional (Bloqueo / Rechazo)</span>' +
+            '<span class="legend-item" style="margin-left: auto; font-family: var(--font-mono); font-size: 0.76rem;">' +
+            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="16" y1="16" x2="16" y2="16.01"/></svg>' +
+            'Agentic QA</span>' +
+            '</div>'
+          );
+        }
+
+        function renderWorkflowPanel(wf) {
+          var types = wf.issueTypes
+            .map(function (t) {
+              return typeChip(t, wf.color);
+            })
+            .join(' ');
+          return (
+            '<div class="animate-fade">' +
+            '<header class="panel-head" style="--wf-color:' +
+            wf.color +
+            '">' +
+            '<p class="eyebrow">Workflow <span class="level-badge">' +
+            esc(wf.levelLabel) +
+            '</span></p>' +
+            '<h2>' +
+            esc(wf.workflowName) +
+            '</h2>' +
+            '<p class="panel-sub">Gobierna: ' +
+            types +
+            '</p>' +
+            '</header>' +
+            renderLegendBar() +
+            '<div class="main-track-head"><span class="main-track-badge">Camino Feliz (Happy Path)</span></div>' +
+            renderMain(wf) +
+            '<div class="sidings-head"><span>Desvíos y Salidas Alternativas</span></div>' +
+            renderSidings(wf) +
+            '</div>'
+          );
+        }
+
+        function renderLevels() {
+          return (
+            '<div class="animate-fade">' +
+            '<header class="panel-head">' +
+            '<p class="eyebrow">Niveles de Arquitectura</p>' +
+            '<h2>Dónde vive cada issue type</h2>' +
+            '</header>' +
+            '<p class="levels-intro">El board de sprint solo muestra dos niveles.</p>' +
+            '<div class="container-band">' +
+            '<span class="band-tag">Nivel 1 · Epic (contenedor)</span>' +
+            '<div class="l2-grid">' +
+            l2Card('story', 'Story') +
+            l2Card('bug', 'Bug · Defect · Improvement') +
+            l2Card('tech', 'Tech Story · Tech Debt') +
+            '</div></div>' +
+            '<div class="depot-band">' +
+            '<span class="band-tag">Depósito Xray (fuera del board de sprint)</span>' +
+            '<div class="depot-grid">' +
+            depotCard('tc') +
+            depotCard('plan') +
+            depotCard('set') +
+            depotCard('pre') +
+            '</div></div>' +
+            renderGovTable() +
+            '</div>'
+          );
+        }
+
+        function l2Card(id, titleOverride) {
+          var wf = byId[id];
+          var types = wf.issueTypes
+            .map(function (t) {
+              return typeChip(t, wf.color);
+            })
+            .join(' ');
+          return (
+            '<div class="l2-card glass" style="--card-color:' +
+            wf.color +
+            '">' +
+            '<h3>' +
+            esc(titleOverride) +
+            '</h3>' +
+            '<div class="types">' +
+            types +
+            '</div>' +
+            '<p class="wf-name">' +
+            esc(wf.workflowName) +
+            '</p>' +
+            '</div>'
+          );
+        }
+
+        function depotCard(id) {
+          var wf = byId[id];
+          return (
+            '<div class="depot-card glass" style="--card-color:' +
+            wf.color +
+            '">' +
+            '<div style="display:flex;align-items:center;justify-content:center;gap:0.4rem;margin-bottom:0.35rem;">' +
+            typeIcon(wf.issueTypes[0], wf.color) +
+            '<b>' +
+            esc(wf.issueTypes.join(' / ')) +
+            '</b></div>' +
+            '<span>' +
+            esc(wf.workflowName) +
+            '</span></div>'
+          );
+        }
+
+        function renderGovTable() {
+          var rows = [
+            ['QA Master Test Plan', 'Test Plan (FTP / STP / ATP)'],
+            ['QA Test Repository', 'Test (TC)'],
+            ['QA Test Artifacts', 'Test Execution, Re-Test Execution, Precondition, Test Set'],
+            ['QA Defect Management', 'Bug, Defect, Improvement'],
+          ];
+          return (
+            '<div class="gov-table-wrapper"><table class="gov-table"><caption>Gobernanza: épicos de proceso QA</caption>' +
+            '<thead><tr><th>Épico de proceso</th><th>Issue types que parentea</th></tr></thead><tbody>' +
+            rows
+              .map(function (r) {
+                return (
+                  '<tr><td class="epic">' +
+                  esc(r[0]) +
+                  '</td><td>' +
+                  glossify(esc(r[1])) +
+                  '</td></tr>'
+                );
+              })
+              .join('') +
+            '</tbody></table></div>'
+          );
+        }
+
+        function journeyBeat(laneId, statusKey, via, note, idx) {
+          var wf = byId[laneId];
+          var st = wf.statuses[statusKey];
+          var cls = ['v-station-card', 'is-static'];
+          if (st.exception) cls.push('is-exception');
+          var noteHtml = note
+            ? '<p class="journey-note" style="margin-top:0.3rem;">' + glossify(esc(note)) + '</p>'
+            : '';
+
+          var eyebrowVia = via ? '<span class="v-via-eyebrow">via: ' + esc(via) + ' →</span>' : '';
+
+          var iconHtml = typeIcon(wf.issueTypes[0], wf.color);
+          var formattedName = formatStatusName(st.name);
+
+          return (
+            '<div class="v-step-item">' +
+            '<div class="v-step-row">' +
+            '<div class="v-node-dot-wrap"><span class="v-node-dot cat-' +
+            st.category +
+            (st.exception ? ' is-exception' : '') +
+            '"></span></div>' +
+            '<div class="v-card-col">' +
+            '<div class="' +
+            cls.join(' ') +
+            '" style="border-left: 3.5px solid ' +
+            wf.color +
+            ';">' +
+            '<div class="v-card-top">' +
+            '<div class="v-card-main-col">' +
+            eyebrowVia +
+            '<span class="v-station-name">' +
+            iconHtml +
+            ' ' +
+            esc(formattedName) +
+            '</span>' +
+            '</div>' +
+            '<div class="v-card-badges">' +
+            '<span class="v-cat-badge cat-' +
+            st.category +
+            '">' +
+            esc(
+              st.category === 'new'
+                ? 'INICIO'
+                : st.category === 'working'
+                  ? 'EN CURSO'
+                  : 'COMPLETADO'
+            ) +
+            '</span>' +
+            '</div>' +
+            '</div>' +
+            noteHtml +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>'
+          );
+        }
+
+        function journeyCrossing(fromLane, toLane, text) {
+          var fw = byId[fromLane];
+          var tw = byId[toLane];
+          return (
+            '<div class="journey-crossing">' +
+            '<div class="crossing-track">' +
+            '<span class="crossing-node">' +
+            typeIcon(fw.issueTypes[0], fw.color) +
+            '</span>' +
+            '<span class="crossing-arrow">⇒</span>' +
+            '<span class="crossing-node">' +
+            typeIcon(tw.issueTypes[0], tw.color) +
+            '</span>' +
+            '</div>' +
+            '<p class="crossing-text">' +
+            glossify(esc(text)) +
+            '</p>' +
+            '</div>'
+          );
+        }
+
+        function renderJourney() {
+          var html =
+            '<div class="animate-fade">' +
+            '<header class="panel-head">' +
+            '<p class="eyebrow">Recorrido del Ciclo de Vida</p>' +
+            '<h2>El cruce más común: Story → Test Execution → Bug → Story</h2>' +
+            '</header>' +
+            '<p class="journey-intro">' +
+            glossify(
+              'En la práctica, una Story real dispara al menos otras dos: abre un <b>Test Execution</b> para correr los <b>Test (TC)</b> trazados, y si algo falla, dispara un <b>Bug</b> con su propio ciclo de vida.'
+            ) +
+            '</p>';
+
+          // Fase 1: Preparación y Desarrollo de la Story
+          html +=
+            '<div class="vertical-circuit glass" style="--wf-color:' +
+            byId.story.color +
+            '">' +
+            '<div class="main-track-head" style="margin-bottom:1.2rem;"><span class="main-track-badge">Fase 1: Preparación y Desarrollo de la Story</span></div>' +
+            '<div class="vertical-steps">';
+
+          var storyBeatsPart1 = [
+            ['story', 'backlog', null, 'La Story ingresa al Backlog.'],
+            ['story', 'shift_left_qa', 'analyze', 'QA refina las ACs y arma el ATP DRAFT.'],
+            ['story', 'estimation', 'estimate', null],
+            [
+              'story',
+              'ready_for_dev',
+              'estimated & ready',
+              'La Story entra al sprint, lista para desarrollo.',
+            ],
+            ['story', 'in_progress', 'start working', null],
+            ['story', 'in_review', 'pull request', null],
+            ['story', 'ready_for_qa', 'deployed', null],
+          ];
+
+          storyBeatsPart1.forEach(function (b, idx) {
+            html += journeyBeat(b[0], b[1], b[2], b[3], idx);
+          });
+
+          html += '</div></div>'; // closes .vertical-steps and .vertical-circuit
+
+          // Fase 2: Ejecución Paralela (Story In Test <-> Test Execution ACTIVE)
+          html +=
+            '<div class="journey-parallel-wrap glass" style="border-left: 4px solid var(--wf-story); padding: 1.2rem 1.4rem; margin: 1.5rem 0; border-radius: var(--radius-md);">' +
+            '<div class="main-track-head" style="margin: 0 0 1rem 0; max-width: 100%; justify-content: flex-start;"><span class="main-track-badge" style="background:var(--wf-exec);color:#fff;">Fase 2: Invocación & Ejecución Paralela</span></div>' +
+            '<div class="journey-parallel-grid" style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.2rem; align-items: center;">' +
+            '<div class="parallel-col">' +
+            journeyBeat(
+              'story',
+              'in_test',
+              'start testing',
+              'QA arranca la verificación de la Story en el sprint.',
+              0
+            ) +
+            '</div>' +
+            '<div class="parallel-arrow" style="text-align: center; color: var(--wf-exec); font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; padding: 0 0.5rem;">' +
+            '<span>Dispara subtarea</span><br/><span style="font-size:1.4rem;line-height:1;">⇒</span>' +
+            '</div>' +
+            '<div class="parallel-col">' +
+            journeyBeat(
+              'exec',
+              'active',
+              null,
+              'Cada Test (TC) linkeado se ejecuta en esta Test Execution y se marca Pass / Fail.',
+              0
+            ) +
+            '</div>' +
+            '</div></div>';
+
+          // Fase 3: Bifurcación según el resultado
+          html +=
+            '<h3 class="journey-fork-head" style="margin: 2rem 0 1rem;">Bifurcación según el resultado de la ejecución</h3>';
+          html += '<div class="journey-fork">';
+
+          html +=
+            '<div class="journey-branch happy glass">' +
+            '<p class="journey-branch-label">✓ Todo Pasa (Camino Feliz / Happy Path)</p>' +
+            '<div class="vertical-steps" style="--wf-color:' +
+            byId.exec.color +
+            '">' +
+            journeyBeat('exec', 'close', 'complete', null, 0) +
+            '</div>' +
+            journeyCrossing(
+              'exec',
+              'story',
+              'Test Execution cerrada en verde → QA da el sign-off sobre la Story.'
+            ) +
+            '<div class="vertical-steps" style="--wf-color:' +
+            byId.story.color +
+            '">' +
+            journeyBeat('story', 'qa_approved', 'QA sign-off', null, 0) +
+            journeyBeat('story', 'ready_for_release', 'include in release', null, 1) +
+            journeyBeat('story', 'deployed_to_production', 'released', null, 2) +
+            '</div></div>';
+
+          html +=
+            '<div class="journey-branch defect glass">' +
+            '<p class="journey-branch-label">✦ Algo Falla (Salida Excepcional / Loop de Defecto)</p>' +
+            journeyCrossing(
+              'exec',
+              'bug',
+              'Un Test (TC) falla → el tester registra un Bug. La Story pasa a BLOCKED (siding: "defect reported").'
+            ) +
+            '<div class="vertical-steps" style="--wf-color:' +
+            byId.bug.color +
+            '">' +
+            journeyBeat('bug', 'open', null, null, 0) +
+            journeyBeat('bug', 'in_progress', 'start fixing', null, 1) +
+            journeyBeat('bug', 'in_review', 'pull request', null, 2) +
+            journeyBeat('bug', 'ready_for_qa', 'fixed & deployed', null, 3) +
+            journeyBeat('bug', 'closed', 'retest passed', null, 4) +
+            '</div>' +
+            journeyCrossing(
+              'bug',
+              'story',
+              'Bug cerrado → la Story vuelve de BLOCKED a In Test (siding: "back") para repetir la ejecución.'
+            ) +
+            '<p class="journey-loop">↺ Vuelve al Test Execution — el ciclo se repite hasta que todo pasa.</p>' +
+            '</div>';
+
+          html += '</div></div>';
+          return html;
+        }
+
+        function renderTabs(activeId, matchCounts) {
+          var board = WORKFLOWS.filter(function (w) {
+            return w.group === 'board';
+          });
+          var xray = WORKFLOWS.filter(function (w) {
+            return w.group === 'xray';
+          });
+
+          function tab(id, label, color) {
+            var isActive = id === activeId;
+            var count = matchCounts && matchCounts[id];
+            var badge = count ? '<span class="tab-badge">' + count + '</span>' : '';
+            var style =
+              'style="--dot-color:' +
+              (color || 'var(--text-faint)') +
+              (isActive && color ? ';--tab-color:' + color + '22;--tab-border:' + color : '') +
+              '"';
+            return (
+              '<button class="tab-btn' +
+              (isActive ? ' active' : '') +
+              '" data-tab="' +
+              id +
+              '" ' +
+              style +
+              '>' +
+              (color ? '<span class="dot-icon"></span>' : '') +
+              esc(label) +
+              badge +
+              '</button>'
+            );
+          }
+
+          var html =
+            '<div class="tab-group"><span class="tab-group-label">Vista General:</span>' +
+            tab('levels', 'Niveles') +
+            tab('journey', 'Recorrido') +
+            '</div>';
+          html +=
+            '<div class="tab-group"><span class="tab-group-label">Tablero Sprint:</span>' +
+            board
+              .map(function (w) {
+                return tab(w.id, w.label, w.color);
+              })
+              .join('') +
+            '</div>';
+          html +=
+            '<div class="tab-group"><span class="tab-group-label">Xray Test Repository:</span>' +
+            xray
+              .map(function (w) {
+                return tab(w.id, w.label, w.color);
+              })
+              .join('') +
+            '</div>';
+          return html;
+        }
+
+        function renderInspectorPlaceholder() {
+          return (
+            '<div class="inspector-panel glass">' +
+            '<p class="station-detail-placeholder">Hacé clic en cualquier estado del circuito para inspeccionar sus salidas alternativas, conexiones de llegada y reglas de metodología QA.</p>' +
+            '</div>'
+          );
+        }
+
+        function setActive(id, targetStationKey) {
+          selectedStationKey = targetStationKey || null;
+          document.getElementById('tabs').innerHTML = renderTabs(id);
+          var panel = document.getElementById('panel');
+          var drawer = document.getElementById('drawer-container');
+          var grid = document.getElementById('workspace-grid');
+
+          if (id === 'levels') {
+            panel.innerHTML = renderLevels();
+            drawer.innerHTML = '';
+            grid.classList.remove('has-drawer');
+          } else if (id === 'journey') {
+            panel.innerHTML = renderJourney();
+            drawer.innerHTML = '';
+            grid.classList.remove('has-drawer');
+          } else {
+            var wf = byId[id];
+            panel.innerHTML = renderWorkflowPanel(wf);
+            drawer.innerHTML = '';
+            grid.classList.remove('has-drawer');
+
+            // Bind click handlers on station cards for inline accordion inspector toggle
+            document.querySelectorAll('.v-station-card[data-key]').forEach(function (el) {
+              el.addEventListener('click', function () {
+                var key = el.getAttribute('data-key');
+                var isAlreadySelected = selectedStationKey === key;
+
+                // Close all open inspectors and deselect cards
+                document.querySelectorAll('.v-station-card[data-key]').forEach(function (s) {
+                  s.classList.remove('is-selected');
+                });
+                document.querySelectorAll('.v-inline-inspector').forEach(function (insp) {
+                  insp.classList.remove('is-open');
+                  insp.innerHTML = '';
+                });
+
+                if (!isAlreadySelected) {
+                  selectedStationKey = key;
+                  el.classList.add('is-selected');
+
+                  var targetInsp = document.getElementById('v-inspector-' + key);
+                  if (targetInsp) {
+                    targetInsp.innerHTML = renderStationDetail(wf, key);
+                    targetInsp.classList.add('is-open');
+                  }
+                } else {
+                  selectedStationKey = null;
+                }
+
+                // Highlight sidings linked to this station
+                document.querySelectorAll('.siding-group').forEach(function (sg) {
+                  sg.classList.remove('is-highlighted');
+                  if (selectedStationKey && sg.getAttribute('data-tokey') === selectedStationKey) {
+                    sg.classList.add('is-highlighted');
+                  }
+                });
+              });
+            });
+
+            // Highlight siding if station was selected
+            if (selectedStationKey) {
+              document.querySelectorAll('.siding-group').forEach(function (sg) {
+                if (sg.getAttribute('data-tokey') === selectedStationKey) {
+                  sg.classList.add('is-highlighted');
+                }
+              });
+            }
+          }
+
+          // Relocate scroll smoothly to top of workspace panel
+          var panelTop = panel.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: panelTop, behavior: 'smooth' });
+        }
+
+        function glossify(str) {
+          if (!str) return '';
+          var s = String(str);
+          GLOSSARY_KEYS.forEach(function (t) {
+            var re = new RegExp('\\b(' + t + ')\\b', 'g');
+            s = s.replace(re, function (m) {
+              return (
+                '<a href="#glossary-section" class="acronym-link" title="' +
+                esc(GLOSSARY[t]) +
+                '">' +
+                m +
+                '</a>'
+              );
+            });
+          });
+          return s;
+        }
+
+        function renderGlossaryList() {
+          document.getElementById('glossary-list').innerHTML = Object.keys(GLOSSARY)
+            .sort()
+            .map(function (term) {
+              return (
+                '<div class="glossary-item"><dt>' +
+                esc(term) +
+                '</dt><dd>' +
+                esc(GLOSSARY[term]) +
+                '</dd></div>'
+              );
+            })
+            .join('');
+        }
+
+        // Theme Toggle Handler (Sun / Moon Icon Button)
+        var isDark = true;
+        var themeBtn = document.getElementById('theme-btn');
+
+        function renderThemeIcon() {
+          if (isDark) {
+            // Show Sun icon (click to turn Light)
+            themeBtn.innerHTML =
+              '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+            themeBtn.title = 'Cambiar a Modo Claro';
+          } else {
+            // Show Moon icon (click to turn Dark)
+            themeBtn.innerHTML =
+              '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+            themeBtn.title = 'Cambiar a Modo Oscuro';
+          }
+        }
+
+        themeBtn.addEventListener('click', function () {
+          isDark = !isDark;
+          if (isDark) {
+            document.body.classList.remove('light-theme');
+          } else {
+            document.body.classList.add('light-theme');
+          }
+          renderThemeIcon();
+        });
+        renderThemeIcon();
+
+        // Indexing Search Engine Handler across ALL 9 Workflows
+        var searchInput = document.getElementById('global-search');
+        var searchDropdown = document.getElementById('search-dropdown');
+
+        function performIndexedSearch(query) {
+          if (!query) {
+            searchDropdown.classList.remove('is-open');
+            searchDropdown.innerHTML = '';
+            return;
+          }
+
+          var q = query.toLowerCase();
+          var resultsByWf = {};
+          var matchCounts = {};
+          var totalMatches = 0;
+
+          WORKFLOWS.forEach(function (wf) {
+            var matches = [];
+
+            // Check status names
+            Object.keys(wf.statuses).forEach(function (stKey) {
+              var st = wf.statuses[stKey];
+              if (st.name.toLowerCase().includes(q)) {
+                matches.push({ type: 'status', key: stKey, name: st.name });
+              }
+            });
+
+            // Check QA Methodology skills
+            if (METHOD_MAP[wf.id]) {
+              Object.keys(METHOD_MAP[wf.id]).forEach(function (mKey) {
+                var m = METHOD_MAP[wf.id][mKey];
+                if (m.skill.toLowerCase().includes(q) || m.text.toLowerCase().includes(q)) {
+                  var stName = wf.statuses[mKey] ? wf.statuses[mKey].name : mKey;
+                  if (
+                    !matches.some(function (item) {
+                      return item.key === mKey;
+                    })
+                  ) {
+                    matches.push({ type: 'skill', key: mKey, name: stName + ' (' + m.skill + ')' });
+                  }
+                }
+              });
+            }
+
+            if (matches.length) {
+              resultsByWf[wf.id] = matches;
+              matchCounts[wf.id] = matches.length;
+              totalMatches += matches.length;
+            }
+          });
+
+          // Update tab badges
+          document.getElementById('tabs').innerHTML = renderTabs(
+            WORKFLOWS.find(function (w) {
+              return document.querySelector('.tab-btn.active[data-tab="' + w.id + '"]');
+            })
+              ? document.querySelector('.tab-btn.active').getAttribute('data-tab')
+              : 'levels',
+            matchCounts
+          );
+
+          if (totalMatches === 0) {
+            searchDropdown.innerHTML =
+              '<div style="padding:0.6rem;font-size:0.82rem;color:var(--text-faint);text-align:center;">Sin coincidencias para "' +
+              esc(query) +
+              '"</div>';
+            searchDropdown.classList.add('is-open');
+            return;
+          }
+
+          var html = '';
+          Object.keys(resultsByWf).forEach(function (wfId) {
+            var wf = byId[wfId];
+            html +=
+              '<div class="search-result-group">' +
+              '<div class="search-result-group-title" style="color:' +
+              wf.color +
+              '">' +
+              typeIcon(wf.issueTypes[0], wf.color) +
+              ' ' +
+              esc(wf.label) +
+              '</div>';
+
+            resultsByWf[wfId].forEach(function (m) {
+              html +=
+                '<div class="search-result-item" data-wfid="' +
+                wf.id +
+                '" data-stkey="' +
+                m.key +
+                '">' +
+                '<span class="match-name">' +
+                esc(m.name) +
+                '</span>' +
+                '<span class="match-context">' +
+                (m.type === 'skill' ? 'Skill QA' : 'Estado') +
+                '</span>' +
+                '</div>';
+            });
+
+            html += '</div>';
+          });
+
+          searchDropdown.innerHTML = html;
+          searchDropdown.classList.add('is-open');
+
+          // Bind click events on search results
+          searchDropdown.querySelectorAll('.search-result-item').forEach(function (item) {
+            item.addEventListener('click', function () {
+              var wfId = item.getAttribute('data-wfid');
+              var stKey = item.getAttribute('data-stkey');
+              setActive(wfId, stKey);
+              searchDropdown.classList.remove('is-open');
+            });
+          });
+        }
+
+        searchInput.addEventListener('input', function (e) {
+          performIndexedSearch(e.target.value.trim());
+        });
+
+        // Close search dropdown on click outside
+        document.addEventListener('click', function (e) {
+          if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+            searchDropdown.classList.remove('is-open');
+          }
+        });
+
+        // Event Delegation for Section Tabs (persists across search re-renders)
+        var tabsContainer = document.getElementById('tabs');
+        if (tabsContainer) {
+          tabsContainer.addEventListener('click', function (e) {
+            var btn = e.target.closest('.tab-btn');
+            if (btn) {
+              var tabId = btn.getAttribute('data-tab');
+              if (tabId) {
+                setActive(tabId);
+              }
+            }
+          });
+        }
+
+        renderGlossaryList();
+        setActive('levels');
+        // Keyboard Shortcut ⌘K / Ctrl+K Listener for Command Palette Search
+        document.addEventListener('keydown', function (e) {
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            if (searchInput) {
+              searchInput.focus();
+              searchInput.select();
+            }
+          }
+        });
+
+        // Event Delegation for Siding Filter Buttons
+        document.addEventListener('click', function (e) {
+          var btn = e.target.closest('.siding-filter-btn');
+          if (btn) {
+            var filter = btn.getAttribute('data-filter');
+            document.querySelectorAll('.siding-filter-btn').forEach(function (b) {
+              b.classList.remove('active');
+            });
+            btn.classList.add('active');
+
+            document.querySelectorAll('.siding-group').forEach(function (card) {
+              if (filter === 'all') {
+                card.style.display = '';
+              } else if (filter === 'exception') {
+                card.style.display = card.classList.contains('is-exception') ? '' : 'none';
+              } else {
+                var dot = card.querySelector('.siding-group-dot');
+                if (
+                  dot &&
+                  dot.classList.contains('cat-' + filter) &&
+                  !card.classList.contains('is-exception')
+                ) {
+                  card.style.display = '';
+                } else {
+                  card.style.display = 'none';
+                }
+              }
+            });
+          }
+        });
+
+        // Event Delegation for Acronym Click -> Scroll to Footer Glossary
+        document.addEventListener('click', function (e) {
+          var link = e.target.closest('.acronym-link');
+          if (link) {
+            e.preventDefault();
+            var details = document.getElementById('glossary-section');
+            if (details) {
+              details.open = true;
+              details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
