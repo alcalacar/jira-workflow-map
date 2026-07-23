@@ -869,18 +869,34 @@
       }
 
       .v-chevron {
-        font-size: 0.75rem;
+        width: 20px;
+        height: 20px;
+        font-size: 0.82rem;
+        font-weight: 700;
         color: var(--text-faint);
-        margin-left: 0.35rem;
-        transition:
-          transform 0.22s ease,
-          color 0.22s ease;
-        display: inline-block;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        margin-left: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        vertical-align: middle;
+      }
+
+      .v-station-card:hover .v-chevron {
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--text-main);
+        border-color: var(--border-strong);
       }
 
       .v-station-card.is-selected .v-chevron {
         transform: rotate(180deg);
-        color: var(--wf-color, var(--text-main));
+        background: var(--wf-color, #3b82f6);
+        color: #ffffff;
+        border-color: var(--wf-color, #3b82f6);
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
       }
 
       .v-station-card.is-static {
@@ -1476,11 +1492,33 @@
         box-shadow: 0 10px 24px var(--shadow-color);
       }
 
+      .l2-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.4rem;
+      }
+
+      .l2-badge {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--border-color);
+        padding: 0.15rem 0.5rem;
+        border-radius: var(--radius-sm);
+        white-space: nowrap;
+      }
+
       .l2-card h3 {
         font-family: var(--font-display);
-        font-size: 1.2rem;
+        font-size: 1.15rem;
         font-weight: 700;
-        margin: 0 0 0.4rem;
+        margin: 0;
         color: var(--card-color);
       }
 
@@ -1508,6 +1546,11 @@
         background: var(--bg-sunken);
         position: relative;
         margin-bottom: 2rem;
+      }
+
+      .depot-band .band-tag {
+        color: var(--wf-tc, #00e676) !important;
+        font-weight: 700;
       }
 
       .depot-grid {
@@ -2932,7 +2975,7 @@
             '<p class="eyebrow">Niveles de Arquitectura</p>' +
             '<h2>Dónde vive cada issue type</h2>' +
             '</header>' +
-            '<p class="levels-intro">El board de sprint solo muestra dos niveles.</p>' +
+            '<p class="levels-intro">El board de sprint solo muestra dos niveles. Los artefactos de Xray viven en su propio depósito.</p>' +
             '<div class="container-band">' +
             '<span class="band-tag">Nivel 1 · Epic (contenedor)</span>' +
             '<div class="l2-grid">' +
@@ -2940,7 +2983,7 @@
             l2Card('bug', 'Bug · Defect · Improvement') +
             l2Card('tech', 'Tech Story · Tech Debt') +
             '</div></div>' +
-            '<div class="depot-band">' +
+            '<div class="depot-band" style="margin-top:1.8rem;">' +
             '<span class="band-tag">Depósito Xray (fuera del board de sprint)</span>' +
             '<div class="depot-grid">' +
             depotCard('tc') +
@@ -2964,9 +3007,12 @@
             '<div class="l2-card glass" style="--card-color:' +
             wf.color +
             '">' +
+            '<div class="l2-card-header">' +
             '<h3>' +
             esc(titleOverride) +
             '</h3>' +
+            '<span class="l2-badge">Nivel 2</span>' +
+            '</div>' +
             '<div class="types">' +
             types +
             '</div>' +
@@ -3111,27 +3157,27 @@
             ) +
             '</p>';
 
-          // Fase 1: Preparación y Desarrollo de la Story
+          // Fase 1: Shift-Left QA (Stage 0) & Desarrollo en Sprint
           html +=
             '<div class="vertical-circuit glass" style="--wf-color:' +
             byId.story.color +
             '">' +
-            '<div class="main-track-head" style="margin-bottom:1.2rem;"><span class="main-track-badge">Fase 1: Preparación y Desarrollo de la Story</span></div>' +
+            '<div class="main-track-head" style="margin-bottom:1.2rem;"><span class="main-track-badge">Fase 1: Shift-Left QA (Stage 0) & Desarrollo en Sprint</span></div>' +
             '<div class="vertical-steps">';
 
           var storyBeatsPart1 = [
             ['story', 'backlog', null, 'La Story ingresa al Backlog.'],
-            ['story', 'shift_left_qa', 'analyze', 'QA refina las ACs y arma el ATP DRAFT.'],
-            ['story', 'estimation', 'estimate', null],
+            ['story', 'shift_left_qa', 'analyze', 'Stage 0: QA refina las ACs y arma el ATP DRAFT.'],
+            ['story', 'estimation', 'estimate', 'Stage 0: Estimación de complejidad y readiness para sprint.'],
             [
               'story',
               'ready_for_dev',
               'estimated & ready',
-              'La Story entra al sprint, lista para desarrollo.',
+              'Sprint Planning: Asignación al desarrollador para construcción.',
             ],
-            ['story', 'in_progress', 'start working', null],
-            ['story', 'in_review', 'pull request', null],
-            ['story', 'ready_for_qa', 'deployed', null],
+            ['story', 'in_progress', 'start working', 'Desarrollo: Construcción de código por el equipo Dev.'],
+            ['story', 'in_review', 'pull request', 'Code Review: Pull Request e inspección de código.'],
+            ['story', 'ready_for_qa', 'deployed', 'Stage 1: Desplegado a ambiente QA — Planificación de Pruebas.'],
           ];
 
           storyBeatsPart1.forEach(function (b, idx) {
@@ -3140,17 +3186,17 @@
 
           html += '</div></div>'; // closes .vertical-steps and .vertical-circuit
 
-          // Fase 2: Ejecución Paralela (Story In Test <-> Test Execution ACTIVE)
+          // Fase 2: Ejecución Trifuerza & Test Execution (Stages 2-3)
           html +=
             '<div class="journey-parallel-wrap glass" style="border-left: 4px solid var(--wf-story); padding: 1.2rem 1.4rem; margin: 1.5rem 0; border-radius: var(--radius-md);">' +
-            '<div class="main-track-head" style="margin: 0 0 1rem 0; max-width: 100%; justify-content: flex-start;"><span class="main-track-badge" style="background:var(--wf-exec);color:#fff;">Fase 2: Invocación & Ejecución Paralela</span></div>' +
+            '<div class="main-track-head" style="margin: 0 0 1rem 0; max-width: 100%; justify-content: flex-start;"><span class="main-track-badge" style="background:var(--wf-exec);color:#fff;">Fase 2: Ejecución Trifuerza & Test Execution (Stages 2-3)</span></div>' +
             '<div class="journey-parallel-grid" style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.2rem; align-items: center;">' +
             '<div class="parallel-col">' +
             journeyBeat(
               'story',
               'in_test',
               'start testing',
-              'QA arranca la verificación de la Story en el sprint.',
+              'Stages 2-3: QA ejecuta exploración trifuerza (UI/API/DB) en el sprint.',
               0
             ) +
             '</div>' +
@@ -3168,56 +3214,55 @@
             '</div>' +
             '</div></div>';
 
-          // Fase 3: Bifurcación según el resultado
+          // Fase 3: Bifurcación de Calidad & Loop de Defectos (Stages 3-6)
           html +=
-            '<h3 class="journey-fork-head" style="margin: 2rem 0 1rem;">Bifurcación según el resultado de la ejecución</h3>';
+            '<div class="main-track-head" style="margin: 2rem 0 1.2rem 0; max-width: 100%; justify-content: flex-start;"><span class="main-track-badge" style="background: linear-gradient(135deg, var(--wf-story), var(--wf-bug)); color: #fff;">Fase 3: Bifurcación de Calidad & Loop de Defectos (Stages 3-6)</span></div>';
           html += '<div class="journey-fork">';
 
+          // Columna Izquierda (Lectura L-R): Algo Falla / Loop de Defecto (Crimson)
           html +=
-            '<div class="journey-branch happy glass">' +
-            '<p class="journey-branch-label">✓ Todo Pasa (Camino Feliz / Happy Path)</p>' +
-            '<div class="vertical-steps" style="--wf-color:' +
-            byId.exec.color +
-            '">' +
-            journeyBeat('exec', 'close', 'complete', null, 0) +
-            '</div>' +
-            journeyCrossing(
-              'exec',
-              'story',
-              'Test Execution cerrada en verde → QA da el sign-off sobre la Story.'
-            ) +
-            '<div class="vertical-steps" style="--wf-color:' +
-            byId.story.color +
-            '">' +
-            journeyBeat('story', 'qa_approved', 'QA sign-off', null, 0) +
-            journeyBeat('story', 'ready_for_release', 'include in release', null, 1) +
-            journeyBeat('story', 'deployed_to_production', 'released', null, 2) +
-            '</div></div>';
-
-          html +=
-            '<div class="journey-branch defect glass">' +
-            '<p class="journey-branch-label">✦ Algo Falla (Salida Excepcional / Loop de Defecto)</p>' +
+            '<div class="journey-branch defect glass" style="--wf-color: var(--wf-bug); border-top: 3.5px solid var(--wf-bug);">' +
+            '<p class="journey-branch-label" style="color: var(--wf-bug);">✦ Algo Falla (Salida Excepcional / Loop de Defecto)</p>' +
             journeyCrossing(
               'exec',
               'bug',
               'Un Test (TC) falla → el tester registra un Bug. La Story pasa a BLOCKED (siding: "defect reported").'
             ) +
-            '<div class="vertical-steps" style="--wf-color:' +
-            byId.bug.color +
-            '">' +
-            journeyBeat('bug', 'open', null, null, 0) +
-            journeyBeat('bug', 'in_progress', 'start fixing', null, 1) +
-            journeyBeat('bug', 'in_review', 'pull request', null, 2) +
-            journeyBeat('bug', 'ready_for_qa', 'fixed & deployed', null, 3) +
-            journeyBeat('bug', 'closed', 'retest passed', null, 4) +
-            '</div>' +
+            '<div class="vertical-circuit glass" style="--wf-color: var(--wf-bug); padding: 0.5rem 0; border: none; background: transparent;">' +
+            '<div class="vertical-steps">' +
+            journeyBeat('bug', 'open', null, 'Triage Stage 2/3: Clasificación de defecto.', 0) +
+            journeyBeat('bug', 'in_progress', 'start fixing', 'Fix: Construcción del fix por Dev.', 1) +
+            journeyBeat('bug', 'in_review', 'pull request', 'Code Review: Pull Request del fix.', 2) +
+            journeyBeat('bug', 'ready_for_qa', 'fixed & deployed', 'Retest: Fix desplegado en ambiente QA.', 3) +
+            journeyBeat('bug', 'closed', 'retest passed', 'Cierre: Bug verificado y cerrado por QA.', 4) +
+            '</div></div>' +
             journeyCrossing(
               'bug',
               'story',
               'Bug cerrado → la Story vuelve de BLOCKED a In Test (siding: "back") para repetir la ejecución.'
             ) +
-            '<p class="journey-loop">↺ Vuelve al Test Execution — el ciclo se repite hasta que todo pasa.</p>' +
+            '<p class="journey-loop" style="color: var(--wf-bug);">↺ Vuelve al Test Execution — el ciclo se repite hasta que todo pasa.</p>' +
             '</div>';
+
+          // Columna Derecha (Lectura L-R): Todo Pasa / Happy Path
+          html +=
+            '<div class="journey-branch happy glass" style="--wf-color: var(--wf-story); border-top: 3.5px solid var(--wf-story);">' +
+            '<p class="journey-branch-label" style="color: var(--wf-story);">✓ Todo Pasa (Camino Feliz / Happy Path)</p>' +
+            '<div class="vertical-circuit glass" style="--wf-color: var(--wf-exec); padding: 0.5rem 0; border: none; background: transparent;">' +
+            '<div class="vertical-steps">' +
+            journeyBeat('exec', 'close', 'complete', 'Test Execution cerrada en verde.', 0) +
+            '</div></div>' +
+            journeyCrossing(
+              'exec',
+              'story',
+              'Test Execution cerrada en verde → QA da el sign-off sobre la Story.'
+            ) +
+            '<div class="vertical-circuit glass" style="--wf-color: var(--wf-story); padding: 0.5rem 0; border: none; background: transparent;">' +
+            '<div class="vertical-steps">' +
+            journeyBeat('story', 'qa_approved', 'QA sign-off', 'Stage 4: QA Approved & Scoring ROI.', 0) +
+            journeyBeat('story', 'ready_for_release', 'include in release', 'Release Backlog: Lista para entrega.', 1) +
+            journeyBeat('story', 'deployed_to_production', 'released', 'Stage 6: Desplegada a Producción & Regresión CI/CD.', 2) +
+            '</div></div></div>';
 
           html += '</div></div>';
           return html;
